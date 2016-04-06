@@ -25,7 +25,7 @@ public class Autonomous {
 	private final double[] speedToOuterWork = { 0.65, 0.65 }, speedToCross = { 0.6, 0.6 }, speedToCrossMoat = { 1, 1 },
 			speedToCrossRock = { 1, 1 };
 
-	private static final double distanceToOuterWork = 48, distanceToCrossWork = 150, // 128
+	private static final double distanceToOuterWork = 48, distanceToCrossWork = 130, // 128
 			distanceToCrossRough = 130, curveAmount = 0.3;
 
 	/**

@@ -119,7 +119,7 @@ public class Teleop {
 			Robot.flywheels.setFlywheelSpeed(off);
 		}
 		
-		double getOver = 2250 + (input.joystickYVal * -1 * 2250);//((-input.joystickYVal/2.0)*0.5)+0.75;
+		double getOver = 2250 * ((-input.joystickYVal + 1)/2) + 2250;//2250 + (input.joystickYVal * -1 * 2250);//((-input.joystickYVal/2.0)*0.5)+0.75;
 		//double getOver = SmarterDashboard.getNumber("MANUAL-SPEED", 0.0);
 		SmartDashboard.putNumber("Flywheel Power", getOver);
 		SmartDashboard.putNumber("Y Joystick", input.joystickYVal);
@@ -141,12 +141,12 @@ public class Teleop {
 		}
 		*/
 		//if(input.joystickButton6){
-		if(input.xboxBRight){
+		if(input.xboxBLeft){
 			Robot.drivebase.chopperUp();
 			SmarterDashboard.putBoolean("CHOPPERS",false);
 		}
 		//else if(input.joystickButton7){
-		else if(input.xboxBLeft){
+		else if(input.xboxBRight){
 			SmarterDashboard.putBoolean("CHOPPERS",true);
 			Robot.drivebase.chopperDown();
 		}

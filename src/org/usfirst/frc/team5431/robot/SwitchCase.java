@@ -30,10 +30,11 @@ public class SwitchCase {
 	// function within autoAim()
 	private static double[] off = { 0, 0 };
 	private static boolean inAuto = false;
-	public static double moveAmount = 0.5;
+	public static double moveAmount = 0.55;
 	public static int checkAmount = 3;
 	private static int timesCount = 0;
 	public static boolean shotTheBall = false;
+	private static final double percentRange = 0.02;
 
 	public SwitchCase() {
 
@@ -82,6 +83,7 @@ public class SwitchCase {
 	 * @return state
 	 */
 	public static int autoAim(int state) {
+		SmartDashboard.putNumber("STATE STATE STATE", state);
 		SmarterDashboard.putBoolean("AUTO", state > 0);
 
 		switch (state) {
@@ -111,28 +113,28 @@ public class SwitchCase {
 				state = 1;
 				pass = false;
 			} else {
-				SmartDashboard.putNumber("CRAPSTUFF", Vision.manVals[1]);}/*else if (Vision.manVals[0] == 5) {// || Vision.manVals[1] == 5){
-			}
-				SmarterDashboard.putString("ERROR", "It's too close and too far");
-				Robot.drivebase.drive(0, 0);
-				state = abortAutoAim;
-
-			}*/
+				SmartDashboard.putNumber("CRAPSTUFF", Vision.manVals[1]);
+			} /*
+				 * else if (Vision.manVals[0] == 5) {// || Vision.manVals[1] ==
+				 * 5){ } SmarterDashboard.putString("ERROR",
+				 * "It's too close and too far"); Robot.drivebase.drive(0, 0);
+				 * state = abortAutoAim;
+				 * 
+				 * }
+				 */
 
 			// You get it now, right?
 			if (pass) {
 				SmartDashboard.putBoolean("PASSED?", true);
-				
+
 				Robot.drivebase.enableBrakeMode();
 				if (Vision.manVals[0] == 0) {
 					state = 4;
-					/*if (timesCount > checkAmount) {
-						state = 4;// Change when you want f/backward
-					} else {
-						state = 1;
-						timesCount += 1;
-						Timer.delay(0.1);
-					}*/
+					/*
+					 * if (timesCount > checkAmount) { state = 4;// Change when
+					 * you want f/backward } else { state = 1; timesCount += 1;
+					 * Timer.delay(0.1); }
+					 */
 				} else if (Vision.manVals[0] == 1) {
 					Robot.drivebase.drive(-moveAmount, moveAmount);
 					state = 1;
@@ -173,31 +175,50 @@ public class SwitchCase {
 			state = 5;
 			break;
 		case 5:
-			state = 5;
+			autoAimTimer = System.currentTimeMillis() + 3000;
+			state = 6;
+			// have to make this better, made into 4 states:
+			// state 5 is to spin the flywheels
+			// state 6 checks if the rpm is correct, and if so, go to state 7
+			// state 7 intakes it
+			// state 8 checks if a second passes, and if so, go to state 0
+		case 6:
+			//this used to do something, but we removed it, and i dont want to change all the numbers again
+			state = 7;
+			break;
+		case 7:
+
+			// state = 5;
 			// shootStates = shoot(shootStates, 0.8);
 			// if(shootStates == 0) {state = -1;}
-			double[] currentRPM = Robot.flywheels.getRPM();
-			int[] speeds3 = {4100, 4100};
-			for (int a = 0; a < 1000; a++) {
-				Robot.flywheels.setPIDSpeed(speeds3);
-				Timer.delay(0.005);
-				if(currentRPM[0] == 4100.0){
-					break;
-				}
+			final double[] currentRPM = Robot.flywheels.getRPM();
+			final int[] speeds3 = { 3900, 3900 };
+			final int marginOfError = (int) (speeds3[0] * percentRange);
+			Robot.flywheels.setPIDSpeed(speeds3);
+			if (System.currentTimeMillis() >= autoAimTimer && ((currentRPM[0] <= speeds3[0] + marginOfError
+					&& currentRPM[0] >= speeds3[0] - marginOfError)
+					|| (currentRPM[1] <= speeds3[1] + marginOfError && currentRPM[1] >= speeds3[1] - marginOfError))) {
+				state = 8;
 			}
-			for(int a = 0; a < 600; a++){
-				Robot.flywheels.setIntakeSpeed(1.0);
-				Timer.delay(0.005);
+			// Teleop.currentShootState=1;
+
+			break;
+		case 8:
+			autoAimIntakeTimer = System.currentTimeMillis() + 1000;
+			state = 9;
+			break;
+		case 9:
+			Robot.flywheels.setIntakeSpeed(1.0);
+			SmartDashboard.putNumber("Auto Aim Timer", autoAimIntakeTimer);
+			if (System.currentTimeMillis() >= autoAimIntakeTimer) {
+				state = 10;
 			}
+			break;
+		case 10:
 			shotTheBall = true;
 			Robot.flywheels.setFlywheelSpeed(off);
-			state = 1;
+			state = -1;
 			break;
-		// have to make this better, made into 4 states:
-		// state 5 is to spin the flywheels
-		// state 6 checks if the rpm is correct, and if so, go to state 7
-		// state 7 intakes it
-		// state 8 checks if a second passes, and if so, go to state 0
 		case abortAutoAim:
 			SmartDashboard.putString("Bug", "Failed to AutoAim");
 			state = 1;
