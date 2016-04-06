@@ -98,7 +98,7 @@ public class Autonomous {
 		driveDistance = Robot.drivebase.getEncDistance();
 		if ((driveDistance[0] < distanceToCrossWork || driveDistance[1] < distanceToCrossWork)
 				&& driveForwardState == 0) {
-			Robot.drivebase.drive(-0.70, -0.73);
+			Robot.drivebase.drive(-0.60, -0.60);
 		} else {
 			Robot.drivebase.drive(0, 0);
 			Robot.drivebase.resetDrive();
