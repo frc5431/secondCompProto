@@ -260,10 +260,10 @@ public class Autonomous {
 			// moatForward();
 			moatForwardState = 1;
 			break;
-		case RockWall:
+		case CrossRockWallAndStop:
 			crossRockWall();
 			break;
-		case AutoShoot:
+		case CrossLowbarAndShoot:
 			LowbarShoot();
 			break;
 		case Spybox:
@@ -272,7 +272,7 @@ public class Autonomous {
 		case RockwallShoot:
 			shootRockWall();
 			break;
-		case StandStill:
+		case DoNothing:
 		default:
 			Timer.delay(0.1);
 			break;

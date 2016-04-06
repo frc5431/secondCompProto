@@ -20,7 +20,7 @@ public class Robot extends IterativeRobot {
     static Teleop teleop;
     static Autonomous auton;
     static OI oiInput;    
-	enum AutoTask{ RockWall, Moat, TouchOuterWork, Lowbar, AutoShoot, StandStill, CrossOuter, Spybox, RockwallShoot, RoughTerrain};
+	enum AutoTask{ CrossRockWallAndStop, Moat, TouchOuterWork, CrossLowbarAndStop, CrossLowbarAndShoot, DoNothing, CrossOuter, Spybox, RockwallShoot, RoughTerrain};
 	static AutoTask currentAuto;
 	
 	public static final boolean brakeMode = false;    
