@@ -6,7 +6,8 @@ public class VisionMath {
 	private static final double areaNum = 0.2, distNum = 0.2, solidNum = 0.4, fromNum = 0.2;
 
 	// Distances and resolution values
-	public static final double screenHalf = 160, minDistance = 78, maxDistance = 94, leftTrig = 30, rightTrig = 36;
+	public static final double screenHalf = 160, minDistance = 76, maxDistance = 150, leftTrig = 29,
+			/* This is actually the right */ rightTrig = 35; // this is actually the left
 
 	private static final double maxArea = 200, maxSolidity = 100;
 
@@ -28,10 +29,15 @@ public class VisionMath {
 	}
 
 	public double SpeedCalc(double distanceFromTower) {
-		return Math.pow((10.9685 * distanceFromTower), -0.5264);// ((3.4028) -
-																// (0.5551 *
-																// Math.log(distanceFromTower)))
-																// + override;
+		return (0.66108 * Math.pow(distanceFromTower, 2)) - (165.37 * distanceFromTower) + 13557;// Math.pow((10.9685
+																									// *
+																									// distanceFromTower),
+																									// -0.5264);//
+																									// ((3.4028)
+																									// -
+		// (0.5551 *
+		// Math.log(distanceFromTower)))
+		// + override;
 	}
 
 	/**
@@ -48,6 +54,7 @@ public class VisionMath {
 		return current - half;
 	}
 
+	/*
 	public double[] RPMCalc(double distanceCalc, double[] currentRPM, double currentPWR) {
 		double[] rpms = { 0, 0 }; // Future RPM needed
 		double[] speeds = { 0, 0, 0, 0, 0, 0 }; // Future speed to adjust
@@ -72,7 +79,7 @@ public class VisionMath {
 		SmarterDashboard.putNumber("AUTO-AIM-SPEED", rpms[0]);
 
 		return speeds;
-	}
+	}*/
 
 	double largest = 0; // Don't mess
 	int current = 0; // Don't mess
@@ -99,30 +106,30 @@ public class VisionMath {
 	public int chooseHole(double[] areas, double[] distances, double[] solidity, double[] fromCenter) {
 		final int amount = areas.length;
 
-		//try {
-			final double holes[] = { 0 }; // Don't mess
+		// try {
+		final double holes[] = { 0 }; // Don't mess
 
-			// If any of the values are negative make sure that they are
-			// positive
-			for (int now = 0; now < amount; now++) {
-				areas[now] = Math.abs(areas[now]);
-				distances[now] = Math.abs(distances[now]);
-				solidity[now] = Math.abs(solidity[now]);
-				fromCenter[now] = Math.abs(fromCenter[now]);
+		// If any of the values are negative make sure that they are
+		// positive
+		for (int now = 0; now < amount; now++) {
+			areas[now] = Math.abs(areas[now]);
+			distances[now] = Math.abs(distances[now]);
+			solidity[now] = Math.abs(solidity[now]);
+			fromCenter[now] = Math.abs(fromCenter[now]);
 
-				holes[now] = (((areas[now] / maxArea) * areaNum) + ((1 - (distances[now] / maxDistance)) * distNum)
-						+ ((solidity[now] / maxSolidity) * solidNum) - ((fromCenter[now] / screenHalf) * fromNum)) / 4;
+			holes[now] = (((areas[now] / maxArea) * areaNum) + ((1 - (distances[now] / maxDistance)) * distNum)
+					+ ((solidity[now] / maxSolidity) * solidNum) - ((fromCenter[now] / screenHalf) * fromNum)) / 4;
 
-				if (holes[now] > largest) {
-					largest = holes[now];
-					current = now;
-				}
-
+			if (holes[now] > largest) {
+				largest = holes[now];
+				current = now;
 			}
-			return current;
-		//} catch (Exception ignored) {
-			//return 666; // Return 666 which means none found
-		//}
+
+		}
+		return current;
+		// } catch (Exception ignored) {
+		// return 666; // Return 666 which means none found
+		// }
 	}
 
 	// See if number is within two other numbers

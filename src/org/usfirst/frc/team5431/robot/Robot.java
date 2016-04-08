@@ -1,7 +1,6 @@
 
 package org.usfirst.frc.team5431.robot;
 
-import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -16,11 +15,10 @@ public class Robot extends IterativeRobot {
     SendableChooser chooser;
     static driveBase drivebase;
     static Shooter flywheels;
-    static ClimbChop pneumatics;
     static Teleop teleop;
     static Autonomous auton;
     static OI oiInput;    
-	enum AutoTask{ CrossRockWallAndStop, Moat, TouchOuterWork, CrossLowbarAndStop, CrossLowbarAndShoot, DoNothing, CrossOuter, Spybox, RockwallShoot, RoughTerrain};
+	enum AutoTask{ CrossRockWallAndStop, CrossMoatAndStop, TouchOuterWork, CrossLowbarAndStop, CrossLowbarAndShoot, DoNothing, CrossOuter, Spybox, CrossRockwallAndShoot};
 	static AutoTask currentAuto;
 	
 	public static final boolean brakeMode = false;    
@@ -35,7 +33,6 @@ public class Robot extends IterativeRobot {
         teleop = new Teleop();
         auton = new Autonomous();
         oiInput = new OI(0, 1);
-        pneumatics = new ClimbChop();
         
         //SmarterDashboard.addDebugString("Robot started");
         
@@ -55,7 +52,6 @@ public class Robot extends IterativeRobot {
     	SmarterDashboard.putBoolean("AUTO", true);
     	currentAuto = AutoTask.valueOf(SmarterDashboard.getString("AUTO-SELECTED", "AutoShoot"));
  		SmartDashboard.putString("Auto Selected: ", currentAuto.toString());
- 		ClimbChop.choppers.set(DoubleSolenoid.Value.kReverse);
  		drivebase.resetDrive();
     }
     

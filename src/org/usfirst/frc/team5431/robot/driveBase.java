@@ -177,6 +177,16 @@ public class driveBase {
 		leftBaseEncoder.reset();
 		rightBaseEncoder.reset();
 	}
+	
+	public void setLeft(double speed) {
+		frontleft.set(speed);
+		rearleft.set(speed);
+	}
+	
+	public void setRight(double speed) {
+		frontright.set(speed);
+		rearright.set(speed);
+	}
 
 	public void enableBrakeMode() {
 		frontright.enableBrakeMode(true);

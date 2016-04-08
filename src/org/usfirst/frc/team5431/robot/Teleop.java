@@ -31,7 +31,7 @@ public class Teleop {
 		//
 		//SmarterDashboard.putNumber("OVERDRIVE", ((-input.joystickYVal/2.0)*0.25)+0.875); //Even out values to become 0.875
 		SmarterDashboard.putNumber("MANUALDRIVE", ((-input.joystickYVal/2.0)*0.5)+0.75);
-		
+		SmarterDashboard.putNumber("AUTO-AIM-SPEED", SwitchCase.cameraVision.getRPMS());
 		Robot.drivebase.drive(input.xboxLeftJoystickVal, input.xboxRightJoystickVal);
 		if(input.xboxLeftJoystickVal < -0.2 || input.xboxRightJoystickVal < -0.2 
 				|| input.xboxLeftJoystickVal > 0.2 || input.xboxRightJoystickVal > 0.2) currentAutoAimState = 0;
@@ -125,7 +125,7 @@ public class Teleop {
 		SmartDashboard.putNumber("Y Joystick", input.joystickYVal);
 		SmarterDashboard.putNumber("POWER", getOver);
 		double[] curRPM = Robot.flywheels.getRPM();
-		SwitchCase.cameraVision.getRPMS(curRPM, getOver);
+		SwitchCase.cameraVision.getRPMS();
 		
 		if(manualEnable) {
 			int woawvers[] = {(int)(getOver), (int)(getOver)};

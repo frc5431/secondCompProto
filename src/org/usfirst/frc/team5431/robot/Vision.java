@@ -135,9 +135,9 @@ public class Vision {
 		}
 	}
 
-	public double[] getRPMS(double[] currentRPM, double currentPWR) {
+	public double getRPMS() {
 		SmartDashboard.putNumber("Current DISTANCE:", getDistance());
-		return math.RPMCalc(getDistance(), currentRPM, currentPWR);
+		return math.SpeedCalc(getDistance());
 	}
 
 	public double getSpeed() {

@@ -40,6 +40,11 @@ public class SmarterDashboard {
 		checkInit();
 		return table.getValue(key, null);
 	}
+	
+	public static double[] getNumberArray(String key, double[] defaults) {
+		checkInit();
+		return table.getNumberArray(key, defaults);
+	}
 
 	public static void putString(String key, String val) {
 		checkInit();

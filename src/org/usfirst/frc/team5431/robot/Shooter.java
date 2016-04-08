@@ -31,15 +31,15 @@ public class Shooter {
 		leftFW = new CANTalon(RobotMap.leftFlyWheel);
 		intakeMotor = new CANTalon(RobotMap.intake);
 		intakeMotor.setInverted(false);
-		rightFW.reverseOutput(true);
+		leftFW.reverseOutput(true);
 		// rightFW.setInverted(true);
 		// leftFW.setInverted(false);
 		leftFW.enableBrakeMode(false);
 		rightFW.enableBrakeMode(false);
 		leftFW.changeControlMode(TalonControlMode.Speed);
 		rightFW.changeControlMode(TalonControlMode.Speed);
-		leftFW.setPID(0.2, 0.0002, 0, 0, 0, 12, 0);
-		rightFW.setPID(0.2, 0.0002, 0, 0, 0, 12, 0);
+		leftFW.setPID(0.2, 0.00021, 0, 0, 0, 12, 0);
+		rightFW.setPID(0.2, 0.00021, 0, 0, 0, 12, 0);
 		rightFW.setFeedbackDevice(FeedbackDevice.EncRising);
 		leftFW.setFeedbackDevice(FeedbackDevice.EncRising);
 		leftFW.configEncoderCodesPerRev(1024);
