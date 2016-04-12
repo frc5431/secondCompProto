@@ -11,21 +11,22 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * to multi-threading and takes less space.
  * 
  * @author Usaid Malik
- */
+ */ 
 public class Autonomous {
 
 	public static int driveForwardState = 0;
 	private int touchForwardState = 0;
 	private int moatForwardState = 0;
 	public static boolean autoAIMState = false;
+	public static boolean seeOnlyTowerState = false;
 	public static int currAIM = 1;
 	private long crossMoatTimer = 0;
 	private static double[] driveDistance = { 0, 0 };
 
 	private final double[] speedToOuterWork = { 0.65, 0.65 }, speedToCrossMoat = { 1, 1 };
 
-	private static final double distanceToOuterWork = 48, distanceToCrossWork = 150, // 128
-			distanceToCrossRough = 130;
+	private static final double distanceToOuterWork = 48, distanceToCrossWork = 135, // 128
+			distanceToCrossRough = 130, distanceToSeeOnlyTower = 12;
 
 	
 	public static enum FirstMove {
@@ -69,27 +70,81 @@ public class Autonomous {
 
 		// touchForwardState = SwitchCase.driveForward(touchForwardState, 72);
 	}
+	
+	private void PorticShoot() {
+		driveDistance = Robot.drivebase.getEncDistance();
+		if ((driveDistance[0] < (distanceToCrossWork + 24) || driveDistance[1] < (distanceToCrossWork + 24))
+				&& driveForwardState == 0) {
+			Robot.drivebase.drive(-0.7, -0.73);
+			Robot.drivebase.chopperDown();
+			SmartDashboard.putString("READY READY READY", "Auto driving");
+		} else {
+			Robot.drivebase.drive(0, 0);
+			Robot.drivebase.resetDrive();
+			Robot.drivebase.chopperUp();
+			Timer.delay(0.25);
+			Robot.drivebase.drive(0, 0);/*
+			
+			
+    		for(int time = 0; time < 15; time++) {
+    			Robot.drivebase.drive(-0.78, 0.78);
+    			Timer.delay(0.005); 
+    		}
+    		for(int time2 = 0; time2 < 30; time2++) {
+    			Robot.drivebase.drive(-0.76, -0.76);
+    			Timer.delay(0.005); 
+    		}*/
+			driveForwardState = 1;
+			if (!autoAIMState) {
+				autoAIMState = true;
+				Timer.delay(0.75);
+				//SwitchCase.moveAmount = 0.43;
+				SwitchCase.checkAmount = 1;
+				SwitchCase.shotTheBall = false;
+				currAIM = SwitchCase.autoAim(currAIM);
+			}
+			if (autoAIMState) {
+
+				SmartDashboard.putString("READY READY READY", "Auto aiming");
+				currAIM = SwitchCase.autoAim(currAIM);
+				if ((currAIM == 0 || currAIM == -1) && !SwitchCase.shotTheBall) {
+					currAIM = 1;
+				}
+			}
+		}
+		
+	}
 
 	private void LowbarShoot() {
 		if((driveDistance[0] < distanceToCrossWork && driveDistance[1] < distanceToCrossWork) && driveForwardState == 0) {
 			//curveFix(speedToOuterWork);
-			Robot.drivebase.drive(-0.70, -0.73);
-		} else if(!autoAIMState) {
+			Robot.drivebase.drive(-0.80, -0.83);
+		} else if(!autoAIMState && !seeOnlyTowerState) {
 			driveForwardState = 1;
-    		for(int time = 0; time < 35; time++) {
-    			Robot.drivebase.drive(0.8, -0.8);
+			Timer.delay(0.5);
+    		for(int time = 0; time < 30; time++) {
+    			Robot.drivebase.drive(0.78, -0.78);
     			Timer.delay(0.005); 
     		}
     		for(int time2 = 0; time2 < 35; time2++) {
-    			Robot.drivebase.drive(-0.6, -0.6);
+    			Robot.drivebase.drive(-0.76, -0.76);
     			Timer.delay(0.005); 
     		}
-	    	autoAIMState = true;
-	    	Timer.delay(0.75);
-	    	SwitchCase.moveAmount = 0.43;
-	    	SwitchCase.checkAmount = 1;
-	    	SwitchCase.shotTheBall = false;
-	    	currAIM = SwitchCase.autoAim(currAIM);
+    		Robot.drivebase.resetDrive(); //Reset encoders for moving forward
+    		seeOnlyTowerState = true;
+		}
+		else if(!autoAIMState && seeOnlyTowerState){
+	    	if(driveDistance[0] < distanceToSeeOnlyTower && driveDistance[1] < distanceToSeeOnlyTower){
+	    		Robot.drivebase.drive(-.70, -.73);
+	    	}
+	    	else{
+	    		autoAIMState = true;
+		    	Timer.delay(0.15);
+		    	//SwitchCase.moveAmount = 0.43;
+		    	SwitchCase.checkAmount = 1;
+		    	SwitchCase.shotTheBall = false;
+		    	currAIM = SwitchCase.autoAim(currAIM);
+	    	}
 		}
 		if(autoAIMState) {
 			SmartDashboard.putString("READY READY READY", "Auto aiming");
@@ -124,7 +179,7 @@ public class Autonomous {
 
 	private void crossRockWall() {
 		driveDistance = Robot.drivebase.getEncDistance();
-		if ((driveDistance[0] < distanceToCrossWork || driveDistance[1] < distanceToCrossWork)
+		if ((driveDistance[0] < distanceToCrossWork - 5 && driveDistance[1] < distanceToCrossWork - 5)
 				&& driveForwardState == 0) {
 			Robot.drivebase.drive(-1, -1);
 		} else {
@@ -148,29 +203,38 @@ public class Autonomous {
 
 	private void shootRockWall() {
 		driveDistance = Robot.drivebase.getEncDistance();
-		if ((driveDistance[0] < (distanceToCrossWork / 2) || driveDistance[1] < (distanceToCrossWork / 2))
+		if ((driveDistance[0] < (distanceToCrossWork - 24) || driveDistance[1] < (distanceToCrossWork - 24))
 				&& driveForwardState == 0) {
 			Robot.drivebase.drive(-1, -1);
+			SmartDashboard.putString("READY READY READY", "Auto driving");
 		} else {
 			Robot.drivebase.drive(0, 0);
 			Robot.drivebase.resetDrive();
-			Timer.delay(0.5);
+			Timer.delay(0.7);
 			Robot.drivebase.drive(0, 0);
+    		
 			driveForwardState = 1;
 			if (!autoAIMState) {
+				for(int time = 0; time < 10; time++) {
+	    			Robot.drivebase.drive(-0.468, 0.468);
+	    			Timer.delay(0.005); 
+	    		}
+				Timer.delay(0.2);
+	    		for(int time2 = 0; time2 < 70; time2++) {
+	    			Robot.drivebase.drive(-0.468, -0.468);
+	    			Timer.delay(0.005); 
+	    		}
 				autoAIMState = true;
-				Timer.delay(0.75);
-				SwitchCase.moveAmount = 0.43;
-				SwitchCase.checkAmount = 1;
+				//Timer.delay(0.2);
 				SwitchCase.shotTheBall = false;
-				currAIM = SwitchCase.autoAim(currAIM);
 			}
-			if (autoAIMState) {
-				SmartDashboard.putString("READY READY READY", "Auto aiming");
-				currAIM = SwitchCase.autoAim(currAIM);
-				if ((currAIM == 0 || currAIM == -1) && !SwitchCase.shotTheBall) {
-					currAIM = 1;
-				}
+		}
+		
+		if (autoAIMState) {
+			SmartDashboard.putString("READY READY READY", "Auto aiming");
+			currAIM = SwitchCase.autoAim(currAIM);
+			if ((currAIM == 0 || currAIM == -1) && !SwitchCase.shotTheBall) {
+				currAIM = 1;
 			}
 		}
 
@@ -428,7 +492,7 @@ public class Autonomous {
 			driveForwardState = 1;
 			autoAIMState = true;
 			Timer.delay(0.75);
-			SwitchCase.moveAmount = 0.43;
+			//SwitchCase.moveAmount = 0.43;
 			SwitchCase.checkAmount = 1;
 			SwitchCase.shotTheBall = false;
 			currAIM = SwitchCase.autoAim(currAIM);
@@ -445,7 +509,7 @@ public class Autonomous {
 	private static void encoderUpdate() {
 		driveDistance = Robot.drivebase.getEncDistance();
 	}
-
+	
 	/**
 	 * Updates the state of various autonomous functions. This must be called in
 	 * <b>autonomousPeriodic()</b>.
@@ -482,6 +546,9 @@ public class Autonomous {
 			break;
 		case CrossRockwallAndShoot:
 			shootRockWall();
+			break;
+		case CrossPortcullisAndShoot:
+			PorticShoot();
 			break;
 		case DoNothing:
 		default:

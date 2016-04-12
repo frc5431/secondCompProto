@@ -18,7 +18,7 @@ public class Robot extends IterativeRobot {
     static Teleop teleop;
     static Autonomous auton;
     static OI oiInput;    
-	enum AutoTask{ CrossRockWallAndStop, CrossMoatAndStop, TouchOuterWork, CrossLowbarAndStop, CrossLowbarAndShoot, DoNothing, CrossOuter, Spybox, CrossRockwallAndShoot};
+	enum AutoTask{ CrossRockWallAndStop, CrossMoatAndStop, TouchOuterWork, CrossLowbarAndStop, CrossLowbarAndShoot, DoNothing, CrossOuter, Spybox,CrossPortcullisAndShoot, CrossRockwallAndShoot};
 	static AutoTask currentAuto;
 	
 	public static final boolean brakeMode = false;    
@@ -65,17 +65,18 @@ public class Robot extends IterativeRobot {
     	Autonomous.autoAIMState = false;
     	Autonomous.currAIM = 0;
     	Autonomous.driveForwardState = 0;
-    	Timer.delay(1); //Sleep a little for little overhead time
+    	Timer.delay(0.1); //Sleep a little for little overhead time
     }
 
     /**
      * This function is called periodically during autonomous
      */
     public void autonomousPeriodic() {
+    	
     	auton.updateStates(currentAuto);
     	SmarterDashboard.putBoolean("connection", true);
     	SmarterDashboard.putBoolean("AUTO", true);
-    	Timer.delay(0.005); // Wait 50 Hz
+    	//Timer.delay(0.005); // Wait 50 Hz
     	//SmarterDashboard.periodic();
     	
     }

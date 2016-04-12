@@ -64,6 +64,7 @@ public class Shooter {
 		returnVals[1] = ((600 * rightFW.getEncVelocity()) / 1024);
 		return returnVals;
 	}
+	
 
 	public void setFlywheelSpeed(double[] speeds) {
 		rightFW.set(speeds[0]);

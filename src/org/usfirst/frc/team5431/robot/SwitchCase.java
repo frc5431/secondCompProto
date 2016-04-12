@@ -18,7 +18,7 @@ public class SwitchCase {
 	// function within autoAim()
 	private static final int[] off = { 0, 0 };
 	private static boolean inAuto = false;
-	public static double moveAmount = 0.54;
+	public static final double moveAmount = 0.48;
 	public static int checkAmount = 3;
 	private static int timesCount = 0;
 	public static boolean shotTheBall = false;
@@ -81,24 +81,24 @@ public class SwitchCase {
 		case 0:
 			cameraVision.Update();
 			inAuto = false;
-			timesCount = 0;
+			//timesCount = 0;
 			break;
 		case 1:
-			SmartDashboard.putNumber("STATE STATE STATE", state);
-			SmartDashboard.putNumber("COUNTINGDUDE", timesCount);
-			SmartDashboard.putBoolean("PASSED?", false);
-			timesCount += 1;
+			//SmartDashboard.putNumber("STATE STATE STATE", state);
+			//SmartDashboard.putNumber("COUNTINGDUDE", timesCount);
+			//SmartDashboard.putBoolean("PASSED?", false);
+			//timesCount += 1;
 			// If David's autoAim code says to shoot
 			cameraVision.Update();
 
 			if (Vision.distance > 80 && Vision.distance < 94) {
 				pass = true;
 			} else if (Vision.distance < 94) {
-				Robot.drivebase.drive(0.45, 0.45);
+				Robot.drivebase.drive(0.7, 0.7);
 				state = 1;
 				pass = false;
 			} else if (Vision.distance > 80) {
-				Robot.drivebase.drive(-0.45, -0.45);
+				Robot.drivebase.drive(-0.7, -0.7);
 				state = 1;
 				pass = false;
 			} else {
@@ -114,7 +114,7 @@ public class SwitchCase {
 
 			// You get it now, right?
 			if (pass) {
-				SmartDashboard.putBoolean("PASSED?", true);
+				//SmartDashboard.putBoolean("PASSED?", true);
 
 				Robot.drivebase.enableBrakeMode();
 				if (Vision.manVals[0] == 0) {
