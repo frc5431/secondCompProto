@@ -23,7 +23,9 @@ public class Robot extends IterativeRobot {
 	enum AutoTask{ CrossRockWallAndStop, CrossMoatAndStop, TouchOuterWork, CrossLowbarAndStop, CrossLowbarAndShoot, DoNothing, CrossOuter, Spybox,CrossPortcullisAndShoot, CrossRockwallAndShoot};
 	static AutoTask currentAuto;
 	static AnalogGyro gyro;
+	private static final double gyroSensitiviy=0.001661;
 	public static final boolean brakeMode = false;    
+	public static double startGyroAngle;
     /**
      * This function is run when the robot is first started up and should be
      * used for any initialization code.
@@ -38,9 +40,10 @@ public class Robot extends IterativeRobot {
         gyro = new AnalogGyro(0);
         
         //gyro.initGyro();
-        gyro.setSensitivity(0.001666);
+        gyro.setSensitivity(gyroSensitiviy);
         //gyro.setSensitivity(.0016594);
         //gyro.calibrate();
+        
         
         //SmarterDashboard.addDebugString("Robot started");
         
@@ -56,12 +59,14 @@ public class Robot extends IterativeRobot {
 	 * If using the SendableChooser make sure to add them to the chooser code above as well.
 	 */
     public void autonomousInit() {
+    	startGyroAngle=gyro.getAngle();
     	drivebase.enableBrakeMode();
     	SmarterDashboard.putBoolean("AUTO", true);
     	currentAuto = AutoTask.valueOf(SmarterDashboard.getString("AUTO-SELECTED", "AutoShoot"));
  		SmartDashboard.putString("Auto Selected: ", currentAuto.toString());
  		drivebase.resetDrive();
  		gyro.reset();
+ 		drivebase.setRampRate(12);
     }
     
     public void disabledPeriodic(){
@@ -97,6 +102,7 @@ public class Robot extends IterativeRobot {
     }
     public void teleopInit(){
     	drivebase.disableBrakeMode();
+    	drivebase.setRampRate(0);
     	gyro.reset();
     }
     /**

@@ -39,7 +39,7 @@ public class Autonomous {
 	private final double[] speedToOuterWork = { 0.65, 0.65 }, speedToCrossMoat = { 1, 1 };
 
 	private static final double distanceToOuterWork = 48, distanceToCrossWork = 135, // 128
-			distanceToCrossRough = 130, distanceToSeeOnlyTower = 12, forwardGyro_barelyCross = 122;
+			distanceToCrossRough = 130, distanceToSeeOnlyTower = 12, forwardGyro_barelyCross = 122;//122
 
 	
 	public static enum FirstMove {
@@ -522,34 +522,49 @@ public class Autonomous {
 	private static void encoderUpdate() {
 		driveDistance = Robot.drivebase.getEncDistance();
 	}
+
+	static double maximumError=0,minimumError=0,forwardGyro_previousAngle=0;
+	
+	private static final double autoGyroDriveSpeed[] = {-0.70,-0.70};
+	private static int autoIterations=0;
 	
 	private static void driveForwardGyro(){
+		SmartDashboard.putBoolean("GYRO CODE ACTIVE",true);
 		driveDistance = Robot.drivebase.getEncDistance();
-		double[] shootPower = {3200.0, 3200.0};
+		final double[] shootPower = {3200.0, 3200.0};
+		SmartDashboard.putNumber("Starting Gyro Angle", Robot.startGyroAngle);
 		if((driveDistance[0] < (forwardGyro_barelyCross) || driveDistance[1] < (forwardGyro_barelyCross)) && driveForwardState == 0 && !forwardGyro_turn) {
 			//if((driveDistance[0] < (0) || driveDistance[1] < (0)) && driveForwardState == 0 && !forwardGyro_turn) {
 			//curveFix(speedToOuterWork);
-			forwardGyro_gyroAngle = Robot.gyro.getAngle() * .025;
-			if(forwardGyro_gyroAngle > .1){
-				forwardGyro_gyroAngle = .1;
+			forwardGyro_previousAngle=forwardGyro_gyroAngle;
+			autoIterations++;
+			SmartDashboard.putNumber("GYRO CALCULATIONS", autoIterations);
+			forwardGyro_gyroAngle = (Robot.gyro.getAngle()-Robot.startGyroAngle) * .025;
+			if(forwardGyro_gyroAngle>0.2){
+				
+				forwardGyro_gyroAngle=0.2;
 			}
-				if(Robot.gyro.getAngle() > 1.0){
-					Robot.drivebase.drive(-.7 + forwardGyro_gyroAngle, -.7 - forwardGyro_gyroAngle);
-					SmartDashboard.putBoolean("Going to the left", true);
-				}
-				else if(Robot.gyro.getAngle() < -1.0){
-					Robot.drivebase.drive(-.7 - forwardGyro_gyroAngle, -.7 + forwardGyro_gyroAngle);
-					SmartDashboard.putBoolean("Going to the left", false);
+			else if(forwardGyro_gyroAngle<-0.2){
+				forwardGyro_gyroAngle=-0.2;
+			}
+			if(forwardGyro_gyroAngle<minimumError)minimumError=forwardGyro_gyroAngle;
+			else if(forwardGyro_gyroAngle>maximumError)maximumError=forwardGyro_gyroAngle;
+			SmartDashboard.putNumber("Maximum Error", maximumError);
+			SmartDashboard.putNumber("Minimum Error", minimumError);
+				if(forwardGyro_gyroAngle > 1.0||forwardGyro_gyroAngle<-1.0){
+					Robot.drivebase.drive(autoGyroDriveSpeed[0]+ forwardGyro_gyroAngle, autoGyroDriveSpeed[1] - forwardGyro_gyroAngle);
+					SmartDashboard.putBoolean("Adjusting straightness", true);
 				}
 				else{
-					Robot.drivebase.drive(-.7, -.7);
+					SmartDashboard.putBoolean("Adjusting straightness", false);
+					Robot.drivebase.drive(autoGyroDriveSpeed[0], autoGyroDriveSpeed[1]);
 				}
 			}
 		else{
 			if(!forwardGyro_turn){
 				forwardGyro_turn = true;
 				Robot.drivebase.drive(0, 0);
-				forwardGyro_turnAngle = -37.0;
+				forwardGyro_turnAngle = -28.0;
 				SmartDashboard.putNumber("Turn angle", forwardGyro_turnAngle);
 				
 			}
@@ -559,11 +574,11 @@ public class Autonomous {
 		if (forwardGyro_turn && !forwardGyro_turnTimed){
 			forwardGyro_counter += 1;
 			if(Robot.gyro.getAngle() > forwardGyro_turnAngle - 3){
-				Robot.drivebase.drive(0.7, -0.7);
+				Robot.drivebase.drive(-autoGyroDriveSpeed[0], autoGyroDriveSpeed[1]);
 				SmartDashboard.putString("Angle Direction", "right");
 			}
 			else{
-				Robot.drivebase.drive(-.63, .63);
+				Robot.drivebase.drive(.63, -.63);
 				SmartDashboard.putNumber("Gyro afterTurn", Robot.gyro.getAngle());
 				SmartDashboard.putNumber("timeAfterTurn", System.currentTimeMillis());
 				forwardGyro_turnTime = System.currentTimeMillis() + 1000;
@@ -645,7 +660,9 @@ public class Autonomous {
 	public void updateStates(AutoTask currentAuto) {
 
 		encoderUpdate();
-
+		
+		SmartDashboard.putString("CURRENT SELECTED", currentAuto.name());
+		
 		switch (currentAuto) {
 		case TouchOuterWork:
 			touchForward();
@@ -683,6 +700,7 @@ public class Autonomous {
 		driveForwardGyroState = SwitchCase.driveForwardGyro(driveForwardGyroState, distanceToCrossWork);
 		// driveForwardState = SwitchCase.driveForward(driveForwardState);
 		// autoAIMState = SwitchCase.autoAim(autoAIMState);
+		
 	}
 
 }

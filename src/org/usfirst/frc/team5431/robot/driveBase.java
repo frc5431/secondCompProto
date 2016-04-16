@@ -187,6 +187,13 @@ public class driveBase {
 		frontright.set(speed);
 		rearright.set(speed);
 	}
+	
+	public void setRampRate(double rate){
+		frontright.setVoltageRampRate(rate);
+		rearright.setVoltageRampRate(rate);
+		frontleft.setVoltageRampRate(rate);
+		rearleft.setVoltageRampRate(rate);
+	}
 
 	public void enableBrakeMode() {
 		frontright.enableBrakeMode(true);
