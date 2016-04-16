@@ -38,7 +38,7 @@ public class Robot extends IterativeRobot {
         gyro = new AnalogGyro(0);
         
         //gyro.initGyro();
-        gyro.setSensitivity(0.001661);
+        gyro.setSensitivity(0.001666);
         //gyro.setSensitivity(.0016594);
         //gyro.calibrate();
         
@@ -74,6 +74,7 @@ public class Robot extends IterativeRobot {
     	Autonomous.autoAIMState = false;
     	Autonomous.currAIM = 0;
     	Autonomous.driveForwardState = 0;
+    	SmartDashboard.putNumber("Gyro Angle", gyro.getAngle());
     	Timer.delay(0.1); //Sleep a little for little overhead time
     }
 

@@ -18,11 +18,13 @@ public class Autonomous {
 	private int driveForwardGyroState = 0;
 	private int touchForwardState = 0;
 	private int moatForwardState = 0;
+	private static double forwardGyro_gyroAngle = 0.0;
 	private static int forwardGyro_counter = 0;
 	public static boolean autoAIMState = false;
 	public static boolean seeOnlyTowerState = false;
 	private static boolean runOnce = false;
 	private static boolean forwardGyro_turn = false;
+	private static boolean forwardGyro_turnTimed = false;
 	private static boolean forwardGyro_shoot = false;
 	private static boolean forwardGyro_intake = false;
 	private static boolean forwardGyro_startFly = false;
@@ -37,7 +39,7 @@ public class Autonomous {
 	private final double[] speedToOuterWork = { 0.65, 0.65 }, speedToCrossMoat = { 1, 1 };
 
 	private static final double distanceToOuterWork = 48, distanceToCrossWork = 135, // 128
-			distanceToCrossRough = 130, distanceToSeeOnlyTower = 12;
+			distanceToCrossRough = 130, distanceToSeeOnlyTower = 12, forwardGyro_barelyCross = 122;
 
 	
 	public static enum FirstMove {
@@ -523,43 +525,64 @@ public class Autonomous {
 	
 	private static void driveForwardGyro(){
 		driveDistance = Robot.drivebase.getEncDistance();
-		double[] shootPower = {3300.0, 3300.0};
-		if((driveDistance[0] < (distanceToCrossWork + 44) || driveDistance[1] < (distanceToCrossWork + 44)) && driveForwardState == 0 && !forwardGyro_turn) {
+		double[] shootPower = {3200.0, 3200.0};
+		if((driveDistance[0] < (forwardGyro_barelyCross) || driveDistance[1] < (forwardGyro_barelyCross)) && driveForwardState == 0 && !forwardGyro_turn) {
 			//if((driveDistance[0] < (0) || driveDistance[1] < (0)) && driveForwardState == 0 && !forwardGyro_turn) {
 			//curveFix(speedToOuterWork);
+			forwardGyro_gyroAngle = Robot.gyro.getAngle() * .025;
+			if(forwardGyro_gyroAngle > .1){
+				forwardGyro_gyroAngle = .1;
+			}
 				if(Robot.gyro.getAngle() > 1.0){
-					Robot.drivebase.drive(-.66, -.74);
+					Robot.drivebase.drive(-.7 + forwardGyro_gyroAngle, -.7 - forwardGyro_gyroAngle);
 					SmartDashboard.putBoolean("Going to the left", true);
 				}
 				else if(Robot.gyro.getAngle() < -1.0){
-					Robot.drivebase.drive(-.74, -.66);
+					Robot.drivebase.drive(-.7 - forwardGyro_gyroAngle, -.7 + forwardGyro_gyroAngle);
 					SmartDashboard.putBoolean("Going to the left", false);
 				}
 				else{
-					Robot.drivebase.drive(-.66, -.66);
+					Robot.drivebase.drive(-.7, -.7);
 				}
 			}
 		else{
 			if(!forwardGyro_turn){
 				forwardGyro_turn = true;
 				Robot.drivebase.drive(0, 0);
-				forwardGyro_turnAngle = -52.0;
+				forwardGyro_turnAngle = -37.0;
 				SmartDashboard.putNumber("Turn angle", forwardGyro_turnAngle);
-				forwardGyro_turnTime = System.currentTimeMillis() + 2000;
-				SmartDashboard.putNumber("turnTime", forwardGyro_turnTime);
+				
 			}
 			//SmartDashboard.putNumber("Turn Counter", 0);
 		}
 		
-		if (forwardGyro_turn && !forwardGyro_shoot){
+		if (forwardGyro_turn && !forwardGyro_turnTimed){
+			forwardGyro_counter += 1;
+			if(Robot.gyro.getAngle() > forwardGyro_turnAngle - 3){
+				Robot.drivebase.drive(0.7, -0.7);
+				SmartDashboard.putString("Angle Direction", "right");
+			}
+			else{
+				Robot.drivebase.drive(-.63, .63);
+				SmartDashboard.putNumber("Gyro afterTurn", Robot.gyro.getAngle());
+				SmartDashboard.putNumber("timeAfterTurn", System.currentTimeMillis());
+				forwardGyro_turnTime = System.currentTimeMillis() + 1000;
+				SmartDashboard.putNumber("turnTime", forwardGyro_turnTime);
+				forwardGyro_turnTimed = true;
+				SwitchCase.shotTheBall = false;
+			}
+		}
+		
+		if(forwardGyro_turnTimed && !forwardGyro_shoot){
 			forwardGyro_counter += 1;
 			SmartDashboard.putNumber("Turn Counter", forwardGyro_counter);
 			if(System.currentTimeMillis() < forwardGyro_turnTime){
-				if(Robot.gyro.getAngle() > forwardGyro_turnAngle * .95){
-					Robot.drivebase.drive(0.7, -.7);
+				/*
+				if(Robot.gyro.getAngle() > forwardGyro_turnAngle - 3){
+					Robot.drivebase.drive(0.7, -0.7);
 					SmartDashboard.putString("Angle Direction", "right");
 				}
-				else if(Robot.gyro.getAngle() < forwardGyro_turnAngle * 1.05){
+				else if(Robot.gyro.getAngle() < forwardGyro_turnAngle + 3){
 					Robot.drivebase.drive(-.7, .7);
 					//Robot.drivebase.drive(0.0, 0.0);
 					SmartDashboard.putString("Angle Direction", "left");
@@ -570,9 +593,10 @@ public class Autonomous {
 					SmartDashboard.putNumber("timeAfterTurn", System.currentTimeMillis());
 					//forwardGyro_shoot = true;
 					SwitchCase.shotTheBall = false;
-				}
+				}*/
 			}
 			else{
+				Robot.drivebase.drive(0.0, 0.0);
 				forwardGyro_shoot = true;
 			}
 		}
@@ -589,7 +613,7 @@ public class Autonomous {
 		if(forwardGyro_startFly && !forwardGyro_intake){
 			//currentRPM = {0.0, 0.0};
 			double[] currentRPM = Robot.flywheels.getRPM();
-			if((currentRPM[0] <= shootPower[0] * 1.1 && currentRPM[0] >= shootPower[0] * .9)|| (currentRPM[1] <= shootPower[1] * 1.1 && currentRPM[1] >= shootPower[1] * .9))
+			if((currentRPM[0] <= shootPower[0] * 1.05 && currentRPM[0] >= shootPower[0] * .95)|| (currentRPM[1] <= shootPower[1] * 1.1 && currentRPM[1] >= shootPower[1] * .9))
 			{
 				forwardGyro_neededTime = System.currentTimeMillis() + 750;
 				forwardGyro_intake = true;
