@@ -19,10 +19,10 @@ public class driveBase {
 																					// distancePerPulse
 																					// in
 																					// inches
-	private static final int samplesToAverage = 7; // How many pulses to do
+	private static final int samplesToAverage = 1; // How many pulses to do
 													// before averaging them
 													// (smoothes encoder count)
-	private static final double minEncRate = 0.0; // Minimum Encoder Rate before
+	private static final double minEncRate = 20.0; // Minimum Encoder Rate before
 													// hardware thinks encoders
 													// are stopped
 	private static CANTalon frontright, frontleft, rearright, rearleft; // Declaration

@@ -65,6 +65,9 @@ public class Shooter {
 		return returnVals;
 	}
 	
+	public void lowgoal(){
+		setFlywheelSpeed(new double[]{500,500});
+	}
 
 	public void setFlywheelSpeed(double[] speeds) {
 		rightFW.set(speeds[0]);

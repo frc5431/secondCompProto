@@ -62,6 +62,40 @@ public class SwitchCase {
 		}
 		return state;
 	}
+	
+	public static int driveForwardGyro(int state, double distancetocrosswork){
+		switch(state){
+		default:
+			break;
+		case 0:
+			break;
+		case 1:
+			driveForwardDistance = wheelCircum * distancetocrosswork;
+			//Robot.gyro.reset();
+			Robot.drivebase.drive(-.75, -.75);
+			state = 2;
+		case 2:
+			encodersDistance = Robot.drivebase.getEncDistance();
+			if (encodersDistance[0] > driveForwardDistance || encodersDistance[1] > driveForwardDistance) {
+				Robot.drivebase.drive(0.0, 0.0);
+				state = 3;
+			}
+			else{
+				/*if(Robot.gyro.getAngle() > 1){
+					Robot.drivebase.drive(-.76, -.75);
+				}
+				else if(Robot.gyro.getAngle() < -1){
+					Robot.drivebase.drive(-.75, -.76);
+				}
+				else{
+					Robot.drivebase.drive(-.75, -.75);
+				}*/
+			}
+		case 3:
+			state = 0;
+		}
+		return state;
+	}
 
 	/**
 	 * Function that uses switch-case autonomous to allow the robot to

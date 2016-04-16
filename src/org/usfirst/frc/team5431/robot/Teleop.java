@@ -30,6 +30,7 @@ public class Teleop {
 	public void Update(OI input){
 		//
 		//SmarterDashboard.putNumber("OVERDRIVE", ((-input.joystickYVal/2.0)*0.25)+0.875); //Even out values to become 0.875
+		
 		SmarterDashboard.putNumber("MANUALDRIVE", ((-input.joystickYVal/2.0)*0.5)+0.75);
 		SmarterDashboard.putNumber("AUTO-AIM-SPEED", SwitchCase.cameraVision.getRPMS());
 		Robot.drivebase.drive(input.xboxLeftJoystickVal, input.xboxRightJoystickVal);
@@ -117,6 +118,10 @@ public class Teleop {
 			manualEnable = false;
 			double off[] = {0, 0};
 			Robot.flywheels.setFlywheelSpeed(off);
+		}
+			
+		if(input.joystickButton10){
+			Robot.flywheels.lowgoal();
 		}
 		
 		double getOver = 2250 * ((-input.joystickYVal + 1)/2) + 2250;//2250 + (input.joystickYVal * -1 * 2250);//((-input.joystickYVal/2.0)*0.5)+0.75;

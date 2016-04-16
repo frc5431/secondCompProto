@@ -15,13 +15,24 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Autonomous {
 
 	public static int driveForwardState = 0;
+	private int driveForwardGyroState = 0;
 	private int touchForwardState = 0;
 	private int moatForwardState = 0;
+	private static int forwardGyro_counter = 0;
 	public static boolean autoAIMState = false;
 	public static boolean seeOnlyTowerState = false;
+	private static boolean runOnce = false;
+	private static boolean forwardGyro_turn = false;
+	private static boolean forwardGyro_shoot = false;
+	private static boolean forwardGyro_intake = false;
+	private static boolean forwardGyro_startFly = false;
+	private static double forwardGyro_turnAngle = 0;
+	private static long forwardGyro_neededTime = 0;
+	private static long forwardGyro_turnTime = 0;
 	public static int currAIM = 1;
 	private long crossMoatTimer = 0;
 	private static double[] driveDistance = { 0, 0 };
+	private static double[] off = {0.0, 0.0};
 
 	private final double[] speedToOuterWork = { 0.65, 0.65 }, speedToCrossMoat = { 1, 1 };
 
@@ -116,7 +127,7 @@ public class Autonomous {
 	}
 
 	private void LowbarShoot() {
-		if((driveDistance[0] < distanceToCrossWork && driveDistance[1] < distanceToCrossWork) && driveForwardState == 0) {
+		if((driveDistance[0] < distanceToCrossWork || driveDistance[1] < distanceToCrossWork) && driveForwardState == 0) {
 			//curveFix(speedToOuterWork);
 			Robot.drivebase.drive(-0.80, -0.83);
 		} else if(!autoAIMState && !seeOnlyTowerState) {
@@ -510,6 +521,93 @@ public class Autonomous {
 		driveDistance = Robot.drivebase.getEncDistance();
 	}
 	
+	private static void driveForwardGyro(){
+		driveDistance = Robot.drivebase.getEncDistance();
+		double[] shootPower = {3300.0, 3300.0};
+		if((driveDistance[0] < (distanceToCrossWork + 44) || driveDistance[1] < (distanceToCrossWork + 44)) && driveForwardState == 0 && !forwardGyro_turn) {
+			//if((driveDistance[0] < (0) || driveDistance[1] < (0)) && driveForwardState == 0 && !forwardGyro_turn) {
+			//curveFix(speedToOuterWork);
+				if(Robot.gyro.getAngle() > 1.0){
+					Robot.drivebase.drive(-.66, -.74);
+					SmartDashboard.putBoolean("Going to the left", true);
+				}
+				else if(Robot.gyro.getAngle() < -1.0){
+					Robot.drivebase.drive(-.74, -.66);
+					SmartDashboard.putBoolean("Going to the left", false);
+				}
+				else{
+					Robot.drivebase.drive(-.66, -.66);
+				}
+			}
+		else{
+			if(!forwardGyro_turn){
+				forwardGyro_turn = true;
+				Robot.drivebase.drive(0, 0);
+				forwardGyro_turnAngle = -52.0;
+				SmartDashboard.putNumber("Turn angle", forwardGyro_turnAngle);
+				forwardGyro_turnTime = System.currentTimeMillis() + 2000;
+				SmartDashboard.putNumber("turnTime", forwardGyro_turnTime);
+			}
+			//SmartDashboard.putNumber("Turn Counter", 0);
+		}
+		
+		if (forwardGyro_turn && !forwardGyro_shoot){
+			forwardGyro_counter += 1;
+			SmartDashboard.putNumber("Turn Counter", forwardGyro_counter);
+			if(System.currentTimeMillis() < forwardGyro_turnTime){
+				if(Robot.gyro.getAngle() > forwardGyro_turnAngle * .95){
+					Robot.drivebase.drive(0.7, -.7);
+					SmartDashboard.putString("Angle Direction", "right");
+				}
+				else if(Robot.gyro.getAngle() < forwardGyro_turnAngle * 1.05){
+					Robot.drivebase.drive(-.7, .7);
+					//Robot.drivebase.drive(0.0, 0.0);
+					SmartDashboard.putString("Angle Direction", "left");
+				}
+				else{
+					Robot.drivebase.drive(0.0, 0.0);
+					SmartDashboard.putNumber("Gyro afterTurn", Robot.gyro.getAngle());
+					SmartDashboard.putNumber("timeAfterTurn", System.currentTimeMillis());
+					//forwardGyro_shoot = true;
+					SwitchCase.shotTheBall = false;
+				}
+			}
+			else{
+				forwardGyro_shoot = true;
+			}
+		}
+		
+		if(forwardGyro_turn && forwardGyro_shoot && !forwardGyro_intake && !forwardGyro_startFly){
+			
+			//SmartDashboard.putNumber(key, value);
+			Robot.flywheels.setFlywheelSpeed(shootPower);
+			SmartDashboard.putNumber("timeAfterStart", System.currentTimeMillis());
+			SmartDashboard.putNumber("Gyro beforeSpinUp", Robot.gyro.getAngle());
+			forwardGyro_startFly = true;
+		}
+		
+		if(forwardGyro_startFly && !forwardGyro_intake){
+			//currentRPM = {0.0, 0.0};
+			double[] currentRPM = Robot.flywheels.getRPM();
+			if((currentRPM[0] <= shootPower[0] * 1.1 && currentRPM[0] >= shootPower[0] * .9)|| (currentRPM[1] <= shootPower[1] * 1.1 && currentRPM[1] >= shootPower[1] * .9))
+			{
+				forwardGyro_neededTime = System.currentTimeMillis() + 750;
+				forwardGyro_intake = true;
+			}
+		}
+		
+		if(forwardGyro_intake){
+			if(System.currentTimeMillis() >= forwardGyro_neededTime){
+				Robot.flywheels.setIntakeSpeed(0.0);
+				Robot.flywheels.setFlywheelSpeed(off);
+			}
+			else
+				Robot.flywheels.setIntakeSpeed(1.0);
+		}
+	}
+	
+	
+	
 	/**
 	 * Updates the state of various autonomous functions. This must be called in
 	 * <b>autonomousPeriodic()</b>.
@@ -529,7 +627,8 @@ public class Autonomous {
 			touchForward();
 			break;
 		case CrossOuter:
-			crossForward();
+			//crossForward();
+			driveForwardGyro();
 			break;
 		case CrossMoatAndStop:
 			// moatForward();
@@ -557,6 +656,7 @@ public class Autonomous {
 		}
 		touchForwardState = SwitchCase.driveForward(touchForwardState, 72);
 		moatForwardState = moatForward(moatForwardState);
+		driveForwardGyroState = SwitchCase.driveForwardGyro(driveForwardGyroState, distanceToCrossWork);
 		// driveForwardState = SwitchCase.driveForward(driveForwardState);
 		// autoAIMState = SwitchCase.autoAim(autoAIMState);
 	}

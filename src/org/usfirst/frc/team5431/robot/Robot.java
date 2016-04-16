@@ -2,6 +2,8 @@
 package org.usfirst.frc.team5431.robot;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.AnalogGyro;
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -20,7 +22,7 @@ public class Robot extends IterativeRobot {
     static OI oiInput;    
 	enum AutoTask{ CrossRockWallAndStop, CrossMoatAndStop, TouchOuterWork, CrossLowbarAndStop, CrossLowbarAndShoot, DoNothing, CrossOuter, Spybox,CrossPortcullisAndShoot, CrossRockwallAndShoot};
 	static AutoTask currentAuto;
-	
+	static AnalogGyro gyro;
 	public static final boolean brakeMode = false;    
     /**
      * This function is run when the robot is first started up and should be
@@ -33,6 +35,12 @@ public class Robot extends IterativeRobot {
         teleop = new Teleop();
         auton = new Autonomous();
         oiInput = new OI(0, 1);
+        gyro = new AnalogGyro(0);
+        
+        //gyro.initGyro();
+        gyro.setSensitivity(0.001661);
+        //gyro.setSensitivity(.0016594);
+        //gyro.calibrate();
         
         //SmarterDashboard.addDebugString("Robot started");
         
@@ -53,6 +61,7 @@ public class Robot extends IterativeRobot {
     	currentAuto = AutoTask.valueOf(SmarterDashboard.getString("AUTO-SELECTED", "AutoShoot"));
  		SmartDashboard.putString("Auto Selected: ", currentAuto.toString());
  		drivebase.resetDrive();
+ 		gyro.reset();
     }
     
     public void disabledPeriodic(){
@@ -76,12 +85,18 @@ public class Robot extends IterativeRobot {
     	auton.updateStates(currentAuto);
     	SmarterDashboard.putBoolean("connection", true);
     	SmarterDashboard.putBoolean("AUTO", true);
+    	SmartDashboard.putNumber("Gyro Angle", gyro.getAngle());
+    	//Update RPM for fly wheels
+        final double[] rpms = flywheels.getRPM();
+		SmarterDashboard.putNumber("FLY-LEFT", rpms[0]);
+		SmarterDashboard.putNumber("FLY-RIGHT", rpms[1]);
     	//Timer.delay(0.005); // Wait 50 Hz
     	//SmarterDashboard.periodic();
     	
     }
     public void teleopInit(){
     	drivebase.disableBrakeMode();
+    	gyro.reset();
     }
     /**
      * This function is called periodically during operator control.
@@ -91,7 +106,7 @@ public class Robot extends IterativeRobot {
     	//SwitchCase.moveAmount = 0.468;
         oiInput.updateVals();
         teleop.Update(oiInput);
-        
+        SmartDashboard.putNumber("Gyro Angle", gyro.getAngle());
         //Update connection
         SmarterDashboard.putBoolean("ENABLED", true);
         SmarterDashboard.putBoolean("connection", true);
