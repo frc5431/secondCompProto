@@ -3,7 +3,9 @@ package org.usfirst.frc.team5431.robot;
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.CANTalon.FeedbackDevice;
 import edu.wpi.first.wpilibj.CANTalon.TalonControlMode;
 
@@ -14,7 +16,8 @@ import edu.wpi.first.wpilibj.CANTalon.TalonControlMode;
  */
 public class Shooter {
 	DigitalInput intakeLimit;
-	CANTalon rightFW, leftFW, intakeMotor, winchMotor;
+	private CANTalon rightFW, leftFW, intakeMotor, winchMotor;
+	private Talon intake;
 	static int rpmdelay = 0;
 	static double rpmbooster = 0;
 	public static final double[] power = { 0, 0 };
@@ -23,14 +26,15 @@ public class Shooter {
 	 * Constructor for the Shooter() class. Assigns motors, encoders, and sets
 	 * settings for them. Encoders are reset after all the motors/encoders are
 	 * assigned. Do not reset encoders by lm,] ' g\calling this multiple times.
-	 * If you do so, you are an idiot. Period.
+	 * If you do so, you are an idiot. Period. Not Marie's period though
 	 */
 	public Shooter() {
 		intakeLimit = new DigitalInput(RobotMap.intakeLim);
 		rightFW = new CANTalon(RobotMap.rightFlyWheel);
 		leftFW = new CANTalon(RobotMap.leftFlyWheel);
 		intakeMotor = new CANTalon(RobotMap.intake);
-		intakeMotor.setInverted(false);
+		intake = new Talon(RobotMap.mecanumIntake);
+		intake.setInverted(true);
 		leftFW.reverseOutput(true);
 		// rightFW.setInverted(true);
 		// leftFW.setInverted(false);
@@ -90,6 +94,7 @@ public class Shooter {
 	}
 
 	public void setIntakeSpeed(double speed) {
+		intake.set(speed);
 		intakeMotor.set(speed);
 		SmarterDashboard.putBoolean("intake", speed != 0);
 		SmarterDashboard.putBoolean("INTAKE-REVERSE", speed < 0);

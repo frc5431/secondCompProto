@@ -76,9 +76,9 @@ public class Robot extends IterativeRobot {
     	SmarterDashboard.periodic();
     	drivebase.resetDrive();
     	//SwitchCase.moveAmount = 0.468;
-    	Autonomous.autoAIMState = false;
-    	Autonomous.currAIM = 0;
-    	Autonomous.driveForwardState = 0;
+//    	Autonomous.autoAIMState = false;
+//    	Autonomous.currAIM = 0;
+//    	Autonomous.driveForwardState = 0;
     	SmartDashboard.putNumber("Gyro Angle", gyro.getAngle());
     	Timer.delay(0.1); //Sleep a little for little overhead time
     }
@@ -87,7 +87,6 @@ public class Robot extends IterativeRobot {
      * This function is called periodically during autonomous
      */
     public void autonomousPeriodic() {
-    	
     	auton.updateStates(currentAuto);
     	SmarterDashboard.putBoolean("connection", true);
     	SmarterDashboard.putBoolean("AUTO", true);

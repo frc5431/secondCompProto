@@ -25,7 +25,7 @@ public class driveBase {
 	private static final double minEncRate = 20.0; // Minimum Encoder Rate before
 													// hardware thinks encoders
 													// are stopped
-	private static CANTalon frontright, frontleft, rearright, rearleft; // Declaration
+	public static CANTalon frontright, frontleft, rearright, rearleft; // Declaration
 																		// of
 																		// CANTalons
 																		// used
@@ -164,7 +164,6 @@ public class driveBase {
 		SmartDashboard.putNumber("RIGHTENCODING", returnVals[1]);
 		return returnVals;
 	}
-
 	public void chopperUp() {
 		chopper.set(1);
 	}

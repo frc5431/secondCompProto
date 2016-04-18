@@ -79,7 +79,9 @@ public class Vision {
 		if (toShoot != 666) {// Don't shoot at nothing (THE DEVIL)
 			final double tempCenter = grip.fromCenter(screenHalf, math)[toShoot]; // Temp
 																					// center
-																					// values
+											
+			SmartDashboard.putNumber("FROMCENTER", (tempCenter));
+			// values
 			// Display values to SmartDashboard!
 			SmarterDashboard.putNumber("HOLE-AREA", areas[toShoot]);
 			SmarterDashboard.putNumber("HOLE-DISTANCE", distances[toShoot]);

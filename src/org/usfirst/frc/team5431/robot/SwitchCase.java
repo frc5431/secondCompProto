@@ -18,7 +18,7 @@ public class SwitchCase {
 	// function within autoAim()
 	private static final int[] off = { 0, 0 };
 	private static boolean inAuto = false;
-	public static final double moveAmount = 0.48;
+	public static final double moveAmount = 0.42;
 	public static int checkAmount = 3;
 	private static int timesCount = 0;
 	public static boolean shotTheBall = false;
@@ -124,7 +124,8 @@ public class SwitchCase {
 			//timesCount += 1;
 			// If David's autoAim code says to shoot
 			cameraVision.Update();
-
+			pass = true;
+			/*
 			if (Vision.distance > 80 && Vision.distance < 94) {
 				pass = true;
 			} else if (Vision.distance < 94) {
@@ -137,7 +138,7 @@ public class SwitchCase {
 				pass = false;
 			} else {
 				SmartDashboard.putNumber("CRAPSTUFF", Vision.manVals[1]);
-			} /*
+			} *//*
 				 * else if (Vision.manVals[0] == 5) {// || Vision.manVals[1] ==
 				 * 5){ } SmarterDashboard.putString("ERROR",
 				 * "It's too close and too far"); Robot.drivebase.drive(0, 0);
@@ -215,7 +216,7 @@ public class SwitchCase {
 			// shootStates = shoot(shootStates, 0.8);
 			// if(shootStates == 0) {state = -1;}
 			final double[] currentRPM = Robot.flywheels.getRPM();
-			final int[] speeds3 = { 4250, 4250 };
+			final int[] speeds3 = { 3200, 3200 };
 			final int marginOfError = (int) (speeds3[0] * percentRange);
 			Robot.flywheels.setPIDSpeed(speeds3);
 			if (System.currentTimeMillis() >= autoAimTimer && ((currentRPM[0] <= speeds3[0] + marginOfError
