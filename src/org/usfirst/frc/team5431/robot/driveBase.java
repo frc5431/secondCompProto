@@ -30,17 +30,6 @@ public class driveBase {
 	private static final double minEncRate = 20.0; // Minimum Encoder Rate before
 													// hardware thinks encoders
 													// are stopped
-	static final double kP = 0.05;
-	static final double kI = 0.00001;
-	static final double kD = 0.17;
-	static final double kF = 0.01;
-	static final double kToleranceDegrees = 1.0f;
-	
-	static final double turn_kP = 0.05;
-	static final double turn_kI = 0.00001;
-	static final double turn_kD = 0.12;
-	static final double turn_kF = 0.006;
-	static final double turn_kToleranceDegrees = 1.0f;
 	public static CANTalon frontright, frontleft, rearright, rearleft; // Declaration
 																		// of
 																		// CANTalons
@@ -52,43 +41,18 @@ public class driveBase {
 												// in the drivebase
 	private static RobotDrive tankDriveBase;
 	public CANTalon chopper;
-	public PIDController driveController;
-	public PIDController turnController;
+	
+	PIDController turnController;
 	AHRS ahrs;
+	static final double kP = 0.05;
+	static final double kI = 0.00001;
+	static final double kD = 0.17;
+	static final double kF = 0.01;
+	static final double kToleranceDegrees = 1.0f;
+	
 	/**
 	 * Constructor for driveBase. All CANTalons are set to coast. If you want to
 	 * set the driveBase to brake, use driveBase(brakeMode).
-	 */
-	/*
-	 * public driveBase(){ frontright = new CANTalon(RobotMap.frontright);
-	 * frontleft = new CANTalon(RobotMap.frontleft); rearright = new
-	 * CANTalon(RobotMap.rearright); rearleft = new CANTalon(RobotMap.rearleft);
-	 * 
-	 * frontright.setInverted(false); //Inverts(or doesn't) motors
-	 * frontleft.setInverted(false); rearright.setInverted(false);
-	 * rearleft.setInverted(false);
-	 * 
-	 * frontright.enableBrakeMode(true); //Default brake mode will be coast
-	 * frontleft.enableBrakeMode(true); rearright.enableBrakeMode(true);
-	 * rearleft.enableBrakeMode(true);
-	 * 
-	 * tankDriveBase = new RobotDrive(frontleft, rearleft, frontright,
-	 * rearright);//Initializes RobotDrive to use tankDrive() rightBaseEncoder =
-	 * new Encoder(RobotMap.rightBaseEnc1, RobotMap.rightBaseEnc2, false,
-	 * EncodingType.k4X);//Using 4X encoding for encoders leftBaseEncoder = new
-	 * Encoder(RobotMap.leftBaseEnc1, RobotMap.leftBaseEnc2, false,
-	 * EncodingType.k4X);
-	 * rightBaseEncoder.setDistancePerPulse(distancePerPulse); //Sets distance
-	 * robot would travel every encoder pulse
-	 * leftBaseEncoder.setDistancePerPulse(distancePerPulse);
-	 * rightBaseEncoder.setSamplesToAverage(samplesToAverage); //Averages
-	 * encoder count rate every samplesToAverage pulses
-	 * leftBaseEncoder.setSamplesToAverage(samplesToAverage);
-	 * rightBaseEncoder.setReverseDirection(false); //Reverses encoder direction
-	 * based on position on robot leftBaseEncoder.setReverseDirection(false);
-	 * rightBaseEncoder.setMinRate(minEncRate); //Sets minimum rate for encoder
-	 * before hardware thinks it is stopped
-	 * leftBaseEncoder.setMinRate(minEncRate); }
 	 */
 
 	/**
@@ -101,6 +65,8 @@ public class driveBase {
 	public driveBase(boolean mode) { // Constructor used if brakeMode is
 										// specified (should be but probably
 										// won't be used){
+		
+		
 		frontright = new CANTalon(RobotMap.frontright); // Instantiates
 														// CANTalons based on
 														// mapping in RobotMap
@@ -150,20 +116,18 @@ public class driveBase {
 		chopper.setSafetyEnabled(false);
 		chopper.enableBrakeMode(true);
 		
+		frontright.setVoltageRampRate(6);
+		frontleft.setVoltageRampRate(6);
 		ahrs = new AHRS(SPI.Port.kMXP);
-		
-		driveController = new PIDController(kP, kI, kD, kF, ahrs, frontright);
-	    driveController.setInputRange(-180.0f,  180.0f);
-	    driveController.setOutputRange(0.2f, 0.7f);
-	    driveController.setAbsoluteTolerance(kToleranceDegrees);
-	    driveController.setContinuous(true);
-	    
-	    turnController = new PIDController(turn_kP, turn_kI, turn_kD, turn_kF, ahrs, frontright);
+    	turnController = new PIDController(kP, kI, kD, kF, ahrs, frontright);
 	    turnController.setInputRange(-180.0f,  180.0f);
-	    turnController.setOutputRange(-0.4f, 0.4f);
+	    turnController.setOutputRange(0.2f, 0.7f);
 	    turnController.setAbsoluteTolerance(kToleranceDegrees);
-	    turnController.setContinuous(true);
-	    
+	    turnController.setContinuous();
+	    rearright.changeControlMode(TalonControlMode.Follower);
+	    rearleft.changeControlMode(TalonControlMode.Follower);
+	    rearright.set(RobotMap.frontright);
+	    rearleft.set(RobotMap.rearleft);
 	}
 
 	/**
@@ -240,53 +204,5 @@ public class driveBase {
 		rearright.enableBrakeMode(false);
 		frontleft.enableBrakeMode(false);
 		rearleft.enableBrakeMode(false);
-	}
-	
-	public void enablePIDCDrive(double speed, float minSpeed, float maxSpeed)
-	{
-		frontright.setVoltageRampRate(6);
-		frontleft.setVoltageRampRate(6);
-		ahrs.reset();
-		rearright.changeControlMode(CANTalon.TalonControlMode.Follower);
-		rearright.set(RobotMap.frontright);
-		rearleft.changeControlMode(CANTalon.TalonControlMode.Follower);
-		rearleft.set(RobotMap.frontleft);
-		
-		driveController.setOutputRange(minSpeed, maxSpeed);
-		driveController.setSetpoint(0.0f);
-		turnController.disable();
-		driveController.enable();
-		frontright.set(speed);
-	}
-	public void enablePIDCTurn(double angle)
-	{
-		frontright.set(0);
-		frontleft.set(0);
-		rearright.changeControlMode(CANTalon.TalonControlMode.Follower);
-		rearleft.changeControlMode(CANTalon.TalonControlMode.Follower);
-		frontleft.changeControlMode(CANTalon.TalonControlMode.Follower);
-		rearright.set(RobotMap.frontright);
-		frontleft.set(RobotMap.frontright);
-		rearleft.set(RobotMap.frontright);
-		frontright.setVoltageRampRate(0);
-		frontleft.setVoltageRampRate(0);
-		rearright.setVoltageRampRate(0);
-		rearleft.setVoltageRampRate(0);
-		turnController.setSetpoint(angle);
-		driveController.disable();
-		turnController.enable();
-	}
-	public void disablePIDC()
-	{
-		driveController.disable();
-		turnController.disable();
-		frontright.changeControlMode(TalonControlMode.PercentVbus);
-		rearright.changeControlMode(TalonControlMode.PercentVbus);
-		frontleft.changeControlMode(TalonControlMode.PercentVbus);
-		rearleft.changeControlMode(TalonControlMode.PercentVbus);
-		frontright.setVoltageRampRate(6);
-		frontleft.setVoltageRampRate(6);
-		rearright.setVoltageRampRate(6);
-		rearleft.setVoltageRampRate(6);
 	}
 }
