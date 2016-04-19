@@ -101,7 +101,9 @@ public class Robot extends IterativeRobot {
     }
     public void teleopInit(){
     	drivebase.disableBrakeMode();
-    	drivebase.setRampRate(0);
+    	drivebase.resetDrive();
+    	//drivebase.setRampRate(0);
+    	//Robot.drivebase.disablePIDC();
     	gyro.reset();
     }
     /**
@@ -113,6 +115,7 @@ public class Robot extends IterativeRobot {
         oiInput.updateVals();
         teleop.Update(oiInput);
         SmartDashboard.putNumber("Gyro Angle", gyro.getAngle());
+        
         //Update connection
         SmarterDashboard.putBoolean("ENABLED", true);
         SmarterDashboard.putBoolean("connection", true);

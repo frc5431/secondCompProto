@@ -18,6 +18,7 @@ public class Autonomous {
 	private int driveForwardGyroState = 0;
 	private int touchForwardState = 0;
 	private int moatForwardState = 0;
+	private int navexLowbarShoot = 0;
 	private static double forwardGyro_gyroAngle = 0.0;
 	private static int forwardGyro_counter = 0;
 	public static boolean autoAIMState = false;
@@ -560,10 +561,8 @@ public class Autonomous {
 				Robot.flywheels.setIntakeSpeed(1.0);
 		}
 	}
-	
-	private static double[] 			ramp=new double[]{0.60,-0.60};
-;
 
+	
 	/**
 	 * Updates the state of various autonomous functions. This must be called in
 	 * <b>autonomousPeriodic()</b>.
@@ -585,25 +584,78 @@ public class Autonomous {
 			touchForward();
 			break;
 		case CrossOuter:
+			SmartDashboard.putNumber("navexState", navexLowbarShoot);
+			double[] shootSpeed = {3300, 3300};
+			switch(navexLowbarShoot)
+			{
+			default:
+				break;
+			case 0:
+				Robot.drivebase.resetDrive();
+				Robot.drivebase.enablePIDCDrive(-0.7, 0.2f, 0.7f);
+				navexLowbarShoot = 1;
+				break;
+			case 1:
+				driveDistance = Robot.drivebase.getEncDistance();
+				if ((driveDistance[0] > (forwardGyro_barelyCross) || driveDistance[1] > (forwardGyro_barelyCross)))
+				{
+					//Robot.drivebase.disablePIDC();
+					//Robot.drivebase.drive(0, 0);
+					Robot.drivebase.enablePIDCTurn(-50);
+					navexLowbarShoot = 2;
+				}
+				break;
+			case 2:
+				if(Math.abs(-50 - Robot.drivebase.ahrs.getYaw()) <= 1)
+				{
+					navexLowbarShoot = 3;
+				}
+				break;
+			case 3:
+				
+				Robot.flywheels.setFlywheelSpeed(shootSpeed);
+				navexLowbarShoot = 4;
+				break;
+			case 4:
+				double[] currentRPM = Robot.flywheels.getRPM();
+				if ((currentRPM[0] <= shootSpeed[0] * 1.05 && currentRPM[0] >= shootSpeed[0] * .95)
+						|| (currentRPM[1] <= shootSpeed[1] * 1.1 && currentRPM[1] >= shootSpeed[1] * .9)) {
+					forwardGyro_neededTime = System.currentTimeMillis() + 750;
+					navexLowbarShoot = 5;
+				}
+				break;
+			case 5:
+				if (System.currentTimeMillis() >= forwardGyro_neededTime) {
+					Robot.flywheels.setIntakeSpeed(0.0);
+					Robot.flywheels.setFlywheelSpeed(off);
+					Robot.drivebase.disablePIDC();
+					navexLowbarShoot = 0;
+				} else
+					Robot.flywheels.setIntakeSpeed(1.0);
+				break;
+			}
 			// crossForward();
 			//driveForwardGyro();
 			
-			
+			/*
 			forwardGyro_turnAngle=-90;
 			//forwardGyro_turnTimed=false;
-			final double rampRate = +0.005;
+//			final double rampRate = -0.005;
 			if (!forwardGyro_turnTimed) {
 				forwardGyro_counter += 1;
-				Robot.drivebase.drive(ramp[0], ramp[1]);
-				ramp[0]-=rampRate;
-				ramp[1]+=rampRate;
+				final double percentageThere = Robot.gyro.getAngle()/forwardGyro_turnAngle;
+				ramp[0] = (0.20-(0.20*percentageThere))+0.50;
+				ramp[1]=-ramp[0];
+				final double pid = motorPID(Robot.gyro.getAngle(), forwardGyro_turnAngle);
+				Robot.drivebase.drive(pid, -pid);
+//				ramp[0]-=rampRate;
+//				ramp[1]+=rampRate;
 				if (Robot.gyro.getAngle() > forwardGyro_turnAngle) {
-					
 					SmartDashboard.putNumber("RAMP 0", ramp[0]);
 					SmartDashboard.putNumber("RAMP 1", ramp[1]);
 					SmartDashboard.putString("Angle Direction", "right");
 				} else {
-					Robot.drivebase.drive(0, 0);
+//					Robot.drivebase.drive(0, 0);
 					// please murder me
 					forwardGyro_turnTime = System.currentTimeMillis() + 1000;
 					SmartDashboard.putNumber("Gyro afterTurn", Robot.gyro.getAngle());
@@ -621,7 +673,7 @@ public class Autonomous {
 				SmartDashboard.putNumber("Turn Counter", forwardGyro_counter);
 
 				if (System.currentTimeMillis() < forwardGyro_turnTime) {
-					//Robot.drivebase.drive(-0.90, 0.90);
+				//	Robot.drivebase.drive(-0.5, 0.5);
 					/*
 					 * if(Robot.gyro.getAngle() > forwardGyro_turnAngle - 3){
 					 * Robot.drivebase.drive(0.7, -0.7); SmartDashboard.putString(
@@ -634,13 +686,13 @@ public class Autonomous {
 					 * SmartDashboard.putNumber("timeAfterTurn",
 					 * System.currentTimeMillis()); //forwardGyro_shoot = true;
 					 * SwitchCase.shotTheBall = false; }
-					 */
+					 *//*
 				} else {
 					Robot.drivebase.drive(0.0, 0.0);
 					forwardGyro_shoot = true;
 				}
 			}
-			
+			*/
 			break;
 		case CrossMoatAndStop:
 			// moatForward();
