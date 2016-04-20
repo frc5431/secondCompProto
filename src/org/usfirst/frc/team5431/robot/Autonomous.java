@@ -592,29 +592,36 @@ public class Autonomous {
 				break;
 			case 0:
 				Robot.drivebase.resetDrive();
-				Robot.drivebase.enablePIDCDrive(-0.7, 0.2f, 0.7f);
+				Robot.drivebase.enablePIDCDrive(-0.65, -1.0f, -0.4f);
 				navexLowbarShoot = 1;
 				break;
 			case 1:
+				//Robot.drivebase.frontleft.set(-0.4);
 				driveDistance = Robot.drivebase.getEncDistance();
 				if ((driveDistance[0] > (forwardGyro_barelyCross) || driveDistance[1] > (forwardGyro_barelyCross)))
 				{
 					//Robot.drivebase.disablePIDC();
 					//Robot.drivebase.drive(0, 0);
-					Robot.drivebase.enablePIDCTurn(-50);
+					Robot.drivebase.enablePIDCTurn(60);
 					navexLowbarShoot = 2;
 				}
 				break;
 			case 2:
-				if(Math.abs(-50 - Robot.drivebase.ahrs.getYaw()) <= 1)
+				if(Robot.drivebase.ahrs.isMoving())//Math.abs(50 - Robot.drivebase.ahrs.getYaw()) <= 15 && 
 				{
+					
+					SwitchCase.shotTheBall = false;
 					navexLowbarShoot = 3;
 				}
 				break;
 			case 3:
-				
-				Robot.flywheels.setFlywheelSpeed(shootSpeed);
-				navexLowbarShoot = 4;
+				SmartDashboard.putString("READY READY READY", "Auto aiming");
+				currAIM = SwitchCase.autoAim(currAIM);
+				if ((currAIM == 0 || currAIM == -1) && !SwitchCase.shotTheBall) {
+					currAIM = 1;
+				}
+				//Robot.flywheels.setFlywheelSpeed(shootSpeed);
+				navexLowbarShoot = 3;
 				break;
 			case 4:
 				double[] currentRPM = Robot.flywheels.getRPM();
@@ -629,9 +636,11 @@ public class Autonomous {
 					Robot.flywheels.setIntakeSpeed(0.0);
 					Robot.flywheels.setFlywheelSpeed(off);
 					Robot.drivebase.disablePIDC();
-					navexLowbarShoot = 0;
+					navexLowbarShoot = 6;
 				} else
 					Robot.flywheels.setIntakeSpeed(1.0);
+				break;
+			case 6://Dead state
 				break;
 			}
 			// crossForward();

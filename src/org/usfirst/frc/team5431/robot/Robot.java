@@ -38,7 +38,7 @@ public class Robot extends IterativeRobot {
         auton = new Autonomous();
         oiInput = new OI(0, 1);
         gyro = new AnalogGyro(0);
-        
+        drivebase.ahrs.reset();
         //gyro.initGyro();
         gyro.setSensitivity(gyroSensitiviy);
         //gyro.setSensitivity(.0016594);
@@ -59,14 +59,15 @@ public class Robot extends IterativeRobot {
 	 * If using the SendableChooser make sure to add them to the chooser code above as well.
 	 */
     public void autonomousInit() {
-    	startGyroAngle=gyro.getAngle();
+    	startGyroAngle=drivebase.ahrs.getYaw();
     	drivebase.enableBrakeMode();
     	SmarterDashboard.putBoolean("AUTO", true);
     	currentAuto = AutoTask.valueOf(SmarterDashboard.getString("AUTO-SELECTED", "AutoShoot"));
  		SmartDashboard.putString("Auto Selected: ", currentAuto.toString());
  		drivebase.resetDrive();
- 		gyro.reset();
- 		drivebase.setRampRate(12);
+ 		//drivebase.ahrs.zeroYaw();
+ 		//drivebase.ahrs.reset();
+ 		//drivebase.setRampRate(12);
     }
     
     public void disabledPeriodic(){
@@ -79,7 +80,7 @@ public class Robot extends IterativeRobot {
 //    	Autonomous.autoAIMState = false;
 //    	Autonomous.currAIM = 0;
 //    	Autonomous.driveForwardState = 0;
-    	SmartDashboard.putNumber("Gyro Angle", gyro.getAngle());
+    	SmartDashboard.putNumber("Gyro Angle", drivebase.ahrs.getYaw());
     	Timer.delay(0.1); //Sleep a little for little overhead time
     }
 
@@ -90,11 +91,12 @@ public class Robot extends IterativeRobot {
     	auton.updateStates(currentAuto);
     	SmarterDashboard.putBoolean("connection", true);
     	SmarterDashboard.putBoolean("AUTO", true);
-    	SmartDashboard.putNumber("Gyro Angle", gyro.getAngle());
+    	SmartDashboard.putNumber("Gyro Angle", drivebase.ahrs.getYaw());
     	//Update RPM for fly wheels
         final double[] rpms = flywheels.getRPM();
 		SmarterDashboard.putNumber("FLY-LEFT", rpms[0]);
 		SmarterDashboard.putNumber("FLY-RIGHT", rpms[1]);
+		SmartDashboard.putBoolean("NAVX CALIBRATING", drivebase.ahrs.isCalibrating());
     	//Timer.delay(0.005); // Wait 50 Hz
     	//SmarterDashboard.periodic();
     	
@@ -102,8 +104,8 @@ public class Robot extends IterativeRobot {
     public void teleopInit(){
     	drivebase.disableBrakeMode();
     	drivebase.resetDrive();
-    	//drivebase.setRampRate(0);
-    	//Robot.drivebase.disablePIDC();
+    	drivebase.setRampRate(0);
+    	Robot.drivebase.disablePIDC();
     	gyro.reset();
     }
     /**

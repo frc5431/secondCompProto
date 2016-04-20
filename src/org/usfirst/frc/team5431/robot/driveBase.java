@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import org.usfirst.frc.team5431.robot.autonPIDOutput;
 
 /**
  * This class declares variables/functions related specifically to the DriveBase
@@ -30,7 +31,23 @@ public class driveBase {
 	private static final double minEncRate = 20.0; // Minimum Encoder Rate before
 													// hardware thinks encoders
 													// are stopped
-	public static CANTalon frontright, frontleft, rearright, rearleft; // Declaration
+	static final double kP = 0.05;
+	static final double kI = 0.00001;
+	static final double kD = 0.17;
+	static final double kF = 0.01;
+	static final double kToleranceDegrees = 0.5f;
+	
+	static final double turn_kP = 0.05;
+	static final double turn_kI = 0.00001;
+	static final double turn_kD = 0.12;
+	static final double turn_kF = 0.006;
+	static final double turn_kToleranceDegrees = 0.5f;
+	public static CANTalon frontright; // Declaration
+	public CANTalon frontleft;
+	static enum pidFlag{driving, turning};
+	static pidFlag flag;
+	public static CANTalon rearright;
+	public static CANTalon rearleft;
 																		// of
 																		// CANTalons
 																		// used
@@ -39,20 +56,48 @@ public class driveBase {
 																		// drivebase
 	Encoder rightBaseEncoder, leftBaseEncoder; // Declaration of encoders used
 												// in the drivebase
-	private static RobotDrive tankDriveBase;
+	static RobotDrive tankDriveBase;
+	static double notPIDSideSpeed = -0.4;
+	
 	public CANTalon chopper;
-	
-	PIDController turnController;
+	public PIDController driveController;
+	private autonPIDOutput pidOutput;
+	//public PIDController turnController;
 	AHRS ahrs;
-	static final double kP = 0.05;
-	static final double kI = 0.00001;
-	static final double kD = 0.17;
-	static final double kF = 0.01;
-	static final double kToleranceDegrees = 1.0f;
-	
 	/**
 	 * Constructor for driveBase. All CANTalons are set to coast. If you want to
 	 * set the driveBase to brake, use driveBase(brakeMode).
+	 */
+	/*
+	 * public driveBase(){ frontright = new CANTalon(RobotMap.frontright);
+	 * frontleft = new CANTalon(RobotMap.frontleft); rearright = new
+	 * CANTalon(RobotMap.rearright); rearleft = new CANTalon(RobotMap.rearleft);
+	 * 
+	 * frontright.setInverted(false); //Inverts(or doesn't) motors
+	 * frontleft.setInverted(false); rearright.setInverted(false);
+	 * rearleft.setInverted(false);
+	 * 
+	 * frontright.enableBrakeMode(true); //Default brake mode will be coast
+	 * frontleft.enableBrakeMode(true); rearright.enableBrakeMode(true);
+	 * rearleft.enableBrakeMode(true);
+	 * 
+	 * tankDriveBase = new RobotDrive(frontleft, rearleft, frontright,
+	 * rearright);//Initializes RobotDrive to use tankDrive() rightBaseEncoder =
+	 * new Encoder(RobotMap.rightBaseEnc1, RobotMap.rightBaseEnc2, false,
+	 * EncodingType.k4X);//Using 4X encoding for encoders leftBaseEncoder = new
+	 * Encoder(RobotMap.leftBaseEnc1, RobotMap.leftBaseEnc2, false,
+	 * EncodingType.k4X);
+	 * rightBaseEncoder.setDistancePerPulse(distancePerPulse); //Sets distance
+	 * robot would travel every encoder pulse
+	 * leftBaseEncoder.setDistancePerPulse(distancePerPulse);
+	 * rightBaseEncoder.setSamplesToAverage(samplesToAverage); //Averages
+	 * encoder count rate every samplesToAverage pulses
+	 * leftBaseEncoder.setSamplesToAverage(samplesToAverage);
+	 * rightBaseEncoder.setReverseDirection(false); //Reverses encoder direction
+	 * based on position on robot leftBaseEncoder.setReverseDirection(false);
+	 * rightBaseEncoder.setMinRate(minEncRate); //Sets minimum rate for encoder
+	 * before hardware thinks it is stopped
+	 * leftBaseEncoder.setMinRate(minEncRate); }
 	 */
 
 	/**
@@ -65,8 +110,6 @@ public class driveBase {
 	public driveBase(boolean mode) { // Constructor used if brakeMode is
 										// specified (should be but probably
 										// won't be used){
-		
-		
 		frontright = new CANTalon(RobotMap.frontright); // Instantiates
 														// CANTalons based on
 														// mapping in RobotMap
@@ -116,18 +159,13 @@ public class driveBase {
 		chopper.setSafetyEnabled(false);
 		chopper.enableBrakeMode(true);
 		
-		frontright.setVoltageRampRate(6);
-		frontleft.setVoltageRampRate(6);
 		ahrs = new AHRS(SPI.Port.kMXP);
-    	turnController = new PIDController(kP, kI, kD, kF, ahrs, frontright);
-	    turnController.setInputRange(-180.0f,  180.0f);
-	    turnController.setOutputRange(0.2f, 0.7f);
-	    turnController.setAbsoluteTolerance(kToleranceDegrees);
-	    turnController.setContinuous();
-	    rearright.changeControlMode(TalonControlMode.Follower);
-	    rearleft.changeControlMode(TalonControlMode.Follower);
-	    rearright.set(RobotMap.frontright);
-	    rearleft.set(RobotMap.rearleft);
+		pidOutput = new autonPIDOutput();
+		driveController = new PIDController(kP, kI, kD, kF, ahrs, pidOutput);
+	    driveController.setInputRange(-180.0f,  180.0f);
+	    //driveController.setOutputRange(0.2f, 0.7f);
+	    driveController.setAbsoluteTolerance(kToleranceDegrees);
+	    driveController.setContinuous(true);
 	}
 
 	/**
@@ -139,10 +177,11 @@ public class driveBase {
 	 * @param right
 	 *            Power to left motor. From -1 to 1.
 	 */
-	public void drive(double left, double right) {
+	public static void drive(double left, double right) {
 		tankDriveBase.tankDrive(left, right);
 		SmarterDashboard.putNumber("LEFT-DRIVE", left);
 		SmarterDashboard.putNumber("RIGHT-DRIVE", right);
+		
 	}
 
 	/**
@@ -198,11 +237,72 @@ public class driveBase {
 		frontleft.enableBrakeMode(true);
 		rearleft.enableBrakeMode(true);
 	}
-
+	
 	public void disableBrakeMode() {
 		frontright.enableBrakeMode(false);
 		rearright.enableBrakeMode(false);
 		frontleft.enableBrakeMode(false);
 		rearleft.enableBrakeMode(false);
+	}
+	
+	public void enablePIDCDrive(double speed, float minSpeed, float maxSpeed)
+	{
+		//ahrs.reset();
+		
+		SmartDashboard.putBoolean("isCalibrating", ahrs.isCalibrating());
+		driveController.disable();
+		frontright.setVoltageRampRate(0);
+		frontleft.setVoltageRampRate(0);
+		rearright.setVoltageRampRate(0);
+		rearleft.setVoltageRampRate(0);
+//		rearright.changeControlMode(CANTalon.TalonControlMode.Follower);
+//		rearright.set(RobotMap.frontright);
+//		rearleft.changeControlMode(CANTalon.TalonControlMode.Follower);
+//		rearleft.set(RobotMap.frontleft);
+		driveController.setPID(kP, kI, kD, kF);
+		driveController.setOutputRange(minSpeed, maxSpeed);
+		double angle = ahrs.getYaw();
+		SmartDashboard.putNumber("AHRS angle", angle);
+		driveController.setSetpoint(angle);
+		
+		driveController.enable();
+		//frontright.set(speed);
+		//frontleft.set(speed);
+		flag = pidFlag.driving;
+		notPIDSideSpeed = speed;
+	}
+	public void enablePIDCTurn(double angle)
+	{
+		//frontright.set(0);
+		//frontleft.set(0);
+		driveController.disable();
+//		rearright.changeControlMode(CANTalon.TalonControlMode.Follower);
+//		rearleft.changeControlMode(CANTalon.TalonControlMode.Follower);
+//		frontleft.changeControlMode(CANTalon.TalonControlMode.Follower);
+//		rearright.set(RobotMap.frontright);
+//		frontleft.set(RobotMap.frontright);
+//		rearleft.set(RobotMap.frontright);
+		frontright.setVoltageRampRate(0);
+		frontleft.setVoltageRampRate(0);
+		rearright.setVoltageRampRate(0);
+		rearleft.setVoltageRampRate(0);
+		driveController.setPID(turn_kP, turn_kI, turn_kD, turn_kF);
+		driveController.setOutputRange(-1.0f, 1.0f);
+		driveController.setSetpoint(angle);
+		driveController.enable();
+		flag = pidFlag.turning;
+		
+	}
+	public void disablePIDC()
+	{
+		driveController.disable();
+//		frontright.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
+//		rearright.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
+//		frontleft.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
+//		rearleft.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
+		frontright.setVoltageRampRate(0);
+		frontleft.setVoltageRampRate(0);
+		rearright.setVoltageRampRate(0);
+		rearleft.setVoltageRampRate(0);
 	}
 }
