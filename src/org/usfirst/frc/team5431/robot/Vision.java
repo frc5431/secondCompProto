@@ -42,7 +42,7 @@ public class Vision {
 			grip = new Grip();
 		} catch (Throwable initError) {
 			SmarterDashboard.putString("ERROR", "Error initializing grip");
-			SmartDashboard.putString("stringBug", "Error initializing grip");
+			//SmartDashboard.putString("stringBug", "Error initializing grip");
 		}
 	}
 
@@ -80,7 +80,7 @@ public class Vision {
 			final double tempCenter = grip.fromCenter(screenHalf, math)[toShoot]; // Temp
 																					// center
 											
-			SmartDashboard.putNumber("FROMCENTER", (tempCenter));
+			//SmartDashboard.putNumber("FROMCENTER", (tempCenter));
 			// values
 			// Display values to SmartDashboard!
 			SmarterDashboard.putNumber("HOLE-AREA", areas[toShoot]);
@@ -138,7 +138,7 @@ public class Vision {
 	}
 
 	public double getRPMS() {
-		SmartDashboard.putNumber("Current DISTANCE:", getDistance());
+		//SmartDashboard.putNumber("Current DISTANCE:", getDistance());
 		return math.SpeedCalc(getDistance());
 	}
 

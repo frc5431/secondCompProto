@@ -190,7 +190,7 @@ public class SwitchCase {
 		 */
 		case 4:
 			Robot.drivebase.disableBrakeMode();
-			SmartDashboard.putNumber("STATE STATE STATE", state);
+			//SmartDashboard.putNumber("STATE STATE STATE", state);
 			// SmartDashboard.putNumber("remoteBug", autoAimRemoteState);
 			// autoAimRemoteState =
 			// if(autoAimRemoteState == 4)
@@ -216,7 +216,7 @@ public class SwitchCase {
 			// shootStates = shoot(shootStates, 0.8);
 			// if(shootStates == 0) {state = -1;}
 			final double[] currentRPM = Robot.flywheels.getRPM();
-			final int[] speeds3 = { 3200, 3200 };
+			final int[] speeds3 = { 3310, 3310 };
 			final int marginOfError = (int) (speeds3[0] * percentRange);
 			Robot.flywheels.setPIDSpeed(speeds3);
 			if (System.currentTimeMillis() >= autoAimTimer && ((currentRPM[0] <= speeds3[0] + marginOfError

@@ -32,15 +32,15 @@ public class driveBase {
 													// hardware thinks encoders
 													// are stopped
 	static final double kP = 0.05;
-	static final double kI = 0.00001;
-	static final double kD = 0.17;
-	static final double kF = 0.01;
+	static final double kI = 0.00002;
+	static final double kD = 0.11;
+	static final double kF = 0.04;
 	static final double kToleranceDegrees = 0.5f;
 	
-	static final double turn_kP = 0.05;
-	static final double turn_kI = 0.00001;
-	static final double turn_kD = 0.12;
-	static final double turn_kF = 0.006;
+	static final double turn_kP = 0.05;//0.05
+	static final double turn_kI = 0.00002;
+	static final double turn_kD = 0.11;
+	static final double turn_kF = 0.04;
 	static final double turn_kToleranceDegrees = 0.5f;
 	public static CANTalon frontright; // Declaration
 	public CANTalon frontleft;
@@ -165,6 +165,7 @@ public class driveBase {
 	    driveController.setInputRange(-180.0f,  180.0f);
 	    //driveController.setOutputRange(0.2f, 0.7f);
 	    driveController.setAbsoluteTolerance(kToleranceDegrees);
+	    //driveController.setPercentTolerance(0.5);
 	    driveController.setContinuous(true);
 	}
 
@@ -250,10 +251,10 @@ public class driveBase {
 		//ahrs.reset();
 		
 		SmartDashboard.putBoolean("isCalibrating", ahrs.isCalibrating());
-		driveController.disable();
-		frontright.setVoltageRampRate(0);
+		driveController.reset();
+		frontright.setVoltageRampRate(8);
 		frontleft.setVoltageRampRate(0);
-		rearright.setVoltageRampRate(0);
+		rearright.setVoltageRampRate(8);
 		rearleft.setVoltageRampRate(0);
 //		rearright.changeControlMode(CANTalon.TalonControlMode.Follower);
 //		rearright.set(RobotMap.frontright);
@@ -275,7 +276,7 @@ public class driveBase {
 	{
 		//frontright.set(0);
 		//frontleft.set(0);
-		driveController.disable();
+		driveController.reset();
 //		rearright.changeControlMode(CANTalon.TalonControlMode.Follower);
 //		rearleft.changeControlMode(CANTalon.TalonControlMode.Follower);
 //		frontleft.changeControlMode(CANTalon.TalonControlMode.Follower);
@@ -287,7 +288,7 @@ public class driveBase {
 		rearright.setVoltageRampRate(0);
 		rearleft.setVoltageRampRate(0);
 		driveController.setPID(turn_kP, turn_kI, turn_kD, turn_kF);
-		driveController.setOutputRange(-1.0f, 1.0f);
+		driveController.setOutputRange(-0.8f, 0.8f);
 		driveController.setSetpoint(angle);
 		driveController.enable();
 		flag = pidFlag.turning;
@@ -295,14 +296,6 @@ public class driveBase {
 	}
 	public void disablePIDC()
 	{
-		driveController.disable();
-//		frontright.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
-//		rearright.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
-//		frontleft.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
-//		rearleft.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
-		frontright.setVoltageRampRate(0);
-		frontleft.setVoltageRampRate(0);
-		rearright.setVoltageRampRate(0);
-		rearleft.setVoltageRampRate(0);
+		driveController.reset();
 	}
 }

@@ -81,6 +81,7 @@ public class Robot extends IterativeRobot {
 //    	Autonomous.currAIM = 0;
 //    	Autonomous.driveForwardState = 0;
     	SmartDashboard.putNumber("Gyro Angle", drivebase.ahrs.getYaw());
+    	SmartDashboard.putBoolean("NAVX CALIBRATING", drivebase.ahrs.isCalibrating());
     	Timer.delay(0.1); //Sleep a little for little overhead time
     }
 
