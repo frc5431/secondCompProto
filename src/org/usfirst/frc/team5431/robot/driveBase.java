@@ -37,23 +37,17 @@ public class driveBase {
 	static final double kF = 0.04;
 	static final double kToleranceDegrees = 0.5f;
 	
-	static final double turn_kP = 0.05;//0.05
+	static final double turn_kP = 0.05;
 	static final double turn_kI = 0.00002;
 	static final double turn_kD = 0.11;
 	static final double turn_kF = 0.04;
 	static final double turn_kToleranceDegrees = 0.5f;
 	public static CANTalon frontright; // Declaration
-	public CANTalon frontleft;
+	public static CANTalon frontleft;
 	static enum pidFlag{driving, turning};
 	static pidFlag flag;
 	public static CANTalon rearright;
 	public static CANTalon rearleft;
-																		// of
-																		// CANTalons
-																		// used
-																		// in
-																		// the
-																		// drivebase
 	Encoder rightBaseEncoder, leftBaseEncoder; // Declaration of encoders used
 												// in the drivebase
 	static RobotDrive tankDriveBase;
@@ -62,44 +56,8 @@ public class driveBase {
 	public CANTalon chopper;
 	public PIDController driveController;
 	private autonPIDOutput pidOutput;
-	//public PIDController turnController;
+	
 	AHRS ahrs;
-	/**
-	 * Constructor for driveBase. All CANTalons are set to coast. If you want to
-	 * set the driveBase to brake, use driveBase(brakeMode).
-	 */
-	/*
-	 * public driveBase(){ frontright = new CANTalon(RobotMap.frontright);
-	 * frontleft = new CANTalon(RobotMap.frontleft); rearright = new
-	 * CANTalon(RobotMap.rearright); rearleft = new CANTalon(RobotMap.rearleft);
-	 * 
-	 * frontright.setInverted(false); //Inverts(or doesn't) motors
-	 * frontleft.setInverted(false); rearright.setInverted(false);
-	 * rearleft.setInverted(false);
-	 * 
-	 * frontright.enableBrakeMode(true); //Default brake mode will be coast
-	 * frontleft.enableBrakeMode(true); rearright.enableBrakeMode(true);
-	 * rearleft.enableBrakeMode(true);
-	 * 
-	 * tankDriveBase = new RobotDrive(frontleft, rearleft, frontright,
-	 * rearright);//Initializes RobotDrive to use tankDrive() rightBaseEncoder =
-	 * new Encoder(RobotMap.rightBaseEnc1, RobotMap.rightBaseEnc2, false,
-	 * EncodingType.k4X);//Using 4X encoding for encoders leftBaseEncoder = new
-	 * Encoder(RobotMap.leftBaseEnc1, RobotMap.leftBaseEnc2, false,
-	 * EncodingType.k4X);
-	 * rightBaseEncoder.setDistancePerPulse(distancePerPulse); //Sets distance
-	 * robot would travel every encoder pulse
-	 * leftBaseEncoder.setDistancePerPulse(distancePerPulse);
-	 * rightBaseEncoder.setSamplesToAverage(samplesToAverage); //Averages
-	 * encoder count rate every samplesToAverage pulses
-	 * leftBaseEncoder.setSamplesToAverage(samplesToAverage);
-	 * rightBaseEncoder.setReverseDirection(false); //Reverses encoder direction
-	 * based on position on robot leftBaseEncoder.setReverseDirection(false);
-	 * rightBaseEncoder.setMinRate(minEncRate); //Sets minimum rate for encoder
-	 * before hardware thinks it is stopped
-	 * leftBaseEncoder.setMinRate(minEncRate); }
-	 */
-
 	/**
 	 * Constructor for the driveBase class. This specifies whether the CANTalons
 	 * are/aren't in brake mode.
@@ -246,47 +204,23 @@ public class driveBase {
 		rearleft.enableBrakeMode(false);
 	}
 	
-	public void enablePIDCDrive(double speed, float minSpeed, float maxSpeed)
+	public void enablePIDCDrive(double speed, double range)
 	{
-		//ahrs.reset();
-		
 		SmartDashboard.putBoolean("isCalibrating", ahrs.isCalibrating());
 		driveController.reset();
-		frontright.setVoltageRampRate(8);
-		frontleft.setVoltageRampRate(0);
-		rearright.setVoltageRampRate(8);
-		rearleft.setVoltageRampRate(0);
-//		rearright.changeControlMode(CANTalon.TalonControlMode.Follower);
-//		rearright.set(RobotMap.frontright);
-//		rearleft.changeControlMode(CANTalon.TalonControlMode.Follower);
-//		rearleft.set(RobotMap.frontleft);
 		driveController.setPID(kP, kI, kD, kF);
-		driveController.setOutputRange(minSpeed, maxSpeed);
+		driveController.setOutputRange(speed - range, speed + range);
 		double angle = ahrs.getYaw();
 		SmartDashboard.putNumber("AHRS angle", angle);
 		driveController.setSetpoint(angle);
-		
+		drive(speed, speed);
 		driveController.enable();
-		//frontright.set(speed);
-		//frontleft.set(speed);
 		flag = pidFlag.driving;
 		notPIDSideSpeed = speed;
 	}
 	public void enablePIDCTurn(double angle)
 	{
-		//frontright.set(0);
-		//frontleft.set(0);
 		driveController.reset();
-//		rearright.changeControlMode(CANTalon.TalonControlMode.Follower);
-//		rearleft.changeControlMode(CANTalon.TalonControlMode.Follower);
-//		frontleft.changeControlMode(CANTalon.TalonControlMode.Follower);
-//		rearright.set(RobotMap.frontright);
-//		frontleft.set(RobotMap.frontright);
-//		rearleft.set(RobotMap.frontright);
-		frontright.setVoltageRampRate(0);
-		frontleft.setVoltageRampRate(0);
-		rearright.setVoltageRampRate(0);
-		rearleft.setVoltageRampRate(0);
 		driveController.setPID(turn_kP, turn_kI, turn_kD, turn_kF);
 		driveController.setOutputRange(-0.8f, 0.8f);
 		driveController.setSetpoint(angle);

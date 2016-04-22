@@ -18,20 +18,10 @@ public class Autonomous {
 	private int driveForwardGyroState = 0;
 	private int touchForwardState = 0;
 	private int moatForwardState = 0;
-	private int navexLowbarShoot = 0;
-	private static double forwardGyro_gyroAngle = 0.0;
-	private static int forwardGyro_counter = 0;
+	public int navexLowbarShoot = 0;
 	public static boolean autoAIMState = false;
 	public static boolean seeOnlyTowerState = false;
-	private static boolean runOnce = false;
-	private static boolean forwardGyro_turn = false;
-	private static boolean forwardGyro_turnTimed = false;
-	private static boolean forwardGyro_shoot = false;
-	private static boolean forwardGyro_intake = false;
-	private static boolean forwardGyro_startFly = false;
-	private static double forwardGyro_turnAngle = 0;
 	private static long forwardGyro_neededTime = 0;
-	private static long forwardGyro_turnTime = 0;
 	private static long FlyWheelTimer = 0;
 	public static int currAIM = 1;
 	private long crossMoatTimer = 0;
@@ -59,16 +49,6 @@ public class Autonomous {
 	}
 
 	private void curveFix(double speeds[]) {
-		/*
-		 * final double toDrive[] = { 0, 0 }; driveDistance =
-		 * Robot.drivebase.getEncDistance(); if(driveDistance[0] <
-		 * driveDistance[1]) { toDrive[0] = speeds[0] - curveAmount; toDrive[1]
-		 * = speeds[1] + curveAmount; } else if(driveDistance[0] >
-		 * driveDistance[1]) { toDrive[0] = speeds[0] + curveAmount; toDrive[1]
-		 * = speeds[1] - curveAmount; } else { toDrive[0] = speeds[0];
-		 * toDrive[1] = speeds[1]; } Robot.drivebase.drive(-toDrive[0],
-		 * -toDrive[1]);
-		 */
 		Robot.drivebase.drive(-speeds[0], -speeds[1]);
 	}
 
@@ -180,13 +160,6 @@ public class Autonomous {
 			driveForwardState = 1;
 		}
 
-		/*
-		 * driveDistance = Robot.drivebase.getEncDistance(); if
-		 * ((driveDistance[0] < distanceToCrossWork || driveDistance[1] <
-		 * distanceToCrossWork) && driveForwardState == 0) {
-		 * Robot.drivebase.drive(-0., -0.60); } else { Robot.drivebase.drive(0,
-		 * 0); Robot.drivebase.resetDrive(); driveForwardState = 1; }
-		 */
 	}
 
 	private void crossRockWall() {
@@ -201,14 +174,6 @@ public class Autonomous {
 		}
 	}
 
-	/*
-	 * private void crossRoughTerrain() { driveDistance =
-	 * Robot.drivebase.getEncDistance(); if ((driveDistance[0] <
-	 * distanceToCrossRough || driveDistance[1] < distanceToCrossRough) &&
-	 * driveForwardState == 0) { Robot.drivebase.drive(-1, -1); } else {
-	 * Robot.drivebase.drive(0, 0); Robot.drivebase.resetDrive();
-	 * driveForwardState = 1; } }
-	 */
 
 	private void shootRockWall() {
 		driveDistance = Robot.drivebase.getEncDistance();
@@ -248,125 +213,6 @@ public class Autonomous {
 		}
 
 	}
-	/*
-	 * public static void processAutonSteps() { final double[] defaults = {0,
-	 * 30, 0}; final double[] stepAuton = new double[50]; final double[] current
-	 * = SmarterDashboard.getNumberArray("AUTO-STEP-SELECT", defaults);
-	 * 
-	 * for(int am = 0; am < current.length; am++) stepAuton[am] = current[am];
-	 * 
-	 * final FirstMove selectedCross = FirstMove.values()[(int) stepAuton[0]];
-	 * //good joy msn final AutoShoot selectedShoot = AutoShoot.values()[(int)
-	 * stepAuton[3]];
-	 * 
-	 * switch(selectedCross) { default : break; case StandStill: drive(0, 0.1,
-	 * 0.1, 1); return; //Just stop bro.... case TouchOuterWork:
-	 * drive(distanceToOuterWork, 0.75, 0.02, 10); //Just touch it dude return;
-	 * case Lowbar: drive(distanceToCrossWork, 0.69, 0.02, 8); //Drive slowly
-	 * break; case RockWall: drive(distanceToCrossWork, 1, 9, false); //Doesn't
-	 * matter to fix break; case RoughTerrain: drive(distanceToCrossRough, 0.9,
-	 * 0.02, 8); break; case Portcullis: fallChopper(); Timer.delay(0.1);
-	 * drive(distanceToCrossWork, 0.7, 0.02, 8); Timer.delay(0.1);
-	 * liftChopper(); break; case ChevalDeFrise: liftChopper();
-	 * Timer.delay(0.01); drive(distanceToOuterWork, 0.6, 0.02, 6);
-	 * Timer.delay(0.1); fallChopper(); Timer.delay(1.4);
-	 * drive(distanceToOuterWork - 10, 0.8, 0.02, 5); break; case Moat:
-	 * liftChopper(); Timer.delay(0.01); drive(distanceToCrossWork, -1, 6,
-	 * false); turnPivot(180, 0.75, 3); break; }
-	 * 
-	 * //Turn if you want turnPivot((int) stepAuton[1], 0.69, 5);
-	 * 
-	 * //Drive if you want drive(stepAuton[2], 0.5, 0.05, 5);
-	 * 
-	 * //Do you autoShoot?
-	 * 
-	 * switch(selectedShoot) { default: break; case True: autoAim(9); break;
-	 * case False: Robot.drivebase.drive(0, 0); break; }
-	 * 
-	 * for(int amount = 0; amount < stepAuton.length; amount++) {
-	 * if(stepAuton[amount] == 0) break; }
-	 * 
-	 * }
-	 * 
-	 * private static void liftChopper() { Robot.drivebase.chopperUp(); }
-	 * 
-	 * private static void fallChopper() { Robot.drivebase.chopperDown(); }
-	 * 
-	 * private static void autoAim(double timeoutSecs) {
-	 * Robot.drivebase.enableBrakeMode();
-	 * 
-	 * final double timeoutSystem = System.currentTimeMillis() + (timeoutSecs *
-	 * 1000); SwitchCase.shotTheBall = false;
-	 * 
-	 * while(System.currentTimeMillis() < timeoutSystem) { currAIM =
-	 * SwitchCase.autoAim(currAIM); if ((currAIM == 0 || currAIM == -1) &&
-	 * !SwitchCase.shotTheBall) { currAIM = 1; } Timer.delay(0.005); }
-	 * SwitchCase.shotTheBall = false; Robot.drivebase.drive(0, 0);
-	 * Timer.delay(0.01); Robot.drivebase.disableBrakeMode(); }
-	 * 
-	 * private static void drive(double distance, double speeds, double
-	 * timeoutSecs, boolean matter) { drive(distance, speeds, 0, timeoutSecs,
-	 * matter); }
-	 * 
-	 * private static void drive(double distance, double speeds, double
-	 * curveFix, double timeoutSecs) { drive(distance, speeds, curveFix,
-	 * timeoutSecs, true); }
-	 * 
-	 * private static void drive(double distance, double speeds, double
-	 * curveFix, double timeoutSecs, boolean matter) { if(distance == 0)
-	 * {Robot.drivebase.drive(0, 0); return;} final boolean direction =
-	 * (distance < 0); Robot.drivebase.resetDrive(); final double timeoutSystem
-	 * = System.currentTimeMillis() + (timeoutSecs * 1000);
-	 * Robot.drivebase.enableBrakeMode(); Timer.delay(0.01);
-	 * 
-	 * distance = direction ? -(distance) : distance;
-	 * 
-	 * while(System.currentTimeMillis() < timeoutSystem && !matter) {
-	 * encoderUpdate(); if(driveDistance[0] < distance && driveDistance[1] <
-	 * distance) { Robot.drivebase.drive(-speeds, -speeds); } else {
-	 * Robot.drivebase.drive(0, 0); break; } Timer.delay(0.005); }
-	 * 
-	 * while(System.currentTimeMillis() < timeoutSystem && matter) {
-	 * encoderUpdate();
-	 * 
-	 * final double toDrive[] = { 0, 0 }; final double fixCurve = (curveFix *
-	 * (driveDistance[0] - driveDistance[1])); toDrive[0] = speeds + fixCurve;
-	 * toDrive[1] = speeds + fixCurve; toDrive[0] = (direction) ? -toDrive[0] :
-	 * toDrive[0]; toDrive[1] = (direction) ? -toDrive[1] : toDrive[1];
-	 * if(driveDistance[0] < distance) { Robot.drivebase.drive(-toDrive[0],
-	 * -toDrive[1]); } else { Robot.drivebase.drive(0, 0); break; }
-	 * Timer.delay(0.005); } Robot.drivebase.drive(0, 0); Timer.delay(0.01);
-	 * Robot.drivebase.disableBrakeMode(); }
-	 * 
-	 * private static void turnPivot(int degrees, double speed, double
-	 * timeoutSecs) { Robot.drivebase.resetDrive(); double distance = (23.75 *
-	 * Math.PI * (degrees / 2)) / 360;//Calculate distance needed to turn final
-	 * boolean direction = degrees < 0;//false is to the right, true is to the
-	 * left if(degrees == 0) return; double timeoutSystem =
-	 * System.currentTimeMillis() + (timeoutSecs * 1000);
-	 * Robot.drivebase.enableBrakeMode(); Timer.delay(0.01); //distance =
-	 * direction ? -(distance) : distance;
-	 * 
-	 * while(System.currentTimeMillis() < timeoutSystem){ encoderUpdate();
-	 * //Update encoders
-	 * 
-	 * boolean Lpass = false, Rpass = false;
-	 * 
-	 * if(driveDistance[0] < distance) {
-	 * Robot.drivebase.setLeft(-1);//(direction) ? speed : -speed); // negative
-	 * is forward ps Usaid } else { Robot.drivebase.setLeft(0.01); Lpass = true;
-	 * }
-	 * 
-	 * if(driveDistance[1] > distance) {
-	 * Robot.drivebase.setRight(1);//(direction) ? speed : -speed); Rpass =
-	 * true; } else { Robot.drivebase.setLeft(-0.01); }
-	 * 
-	 * if(Lpass && Rpass) {Timer.delay(0.005); break;}
-	 * 
-	 * Timer.delay(0.005); //Motor update period (50Hz) }
-	 * Robot.drivebase.drive(0, 0); Timer.delay(0.01);
-	 * Robot.drivebase.disableBrakeMode(); }
-	 */
 
 	private int moatForward(int state) {
 		switch (state) {
@@ -445,124 +291,6 @@ public class Autonomous {
 
 	static double maximumError = 0, minimumError = 0, forwardGyro_previousAngle = 0;
 
-	private static final double autoGyroDriveSpeed[] = { -0.70, -0.70 };
-	private static int autoIterations = 0;
-
-	private static void driveForwardGyro() {
-		SmartDashboard.putBoolean("GYRO CODE ACTIVE", true);
-		driveDistance = Robot.drivebase.getEncDistance();
-		final double[] shootPower = { 3200.0, 3200.0 };
-		SmartDashboard.putNumber("Starting Gyro Angle", Robot.startGyroAngle);
-		if ((driveDistance[0] < (forwardGyro_barelyCross) || driveDistance[1] < (forwardGyro_barelyCross))
-				&& driveForwardState == 0 && !forwardGyro_turn) {
-			// if((driveDistance[0] < (0) || driveDistance[1] < (0)) &&
-			// driveForwardState == 0 && !forwardGyro_turn) {
-			// curveFix(speedToOuterWork);
-			forwardGyro_previousAngle = forwardGyro_gyroAngle;
-			autoIterations++;
-			SmartDashboard.putNumber("GYRO CALCULATIONS", autoIterations);
-			forwardGyro_gyroAngle = (Robot.gyro.getAngle() - Robot.startGyroAngle) * .025;
-			if (forwardGyro_gyroAngle > 0.2) {
-
-				forwardGyro_gyroAngle = 0.2;
-			} else if (forwardGyro_gyroAngle < -0.2) {
-				forwardGyro_gyroAngle = -0.2;
-			}
-			if (forwardGyro_gyroAngle < minimumError)
-				minimumError = forwardGyro_gyroAngle;
-			else if (forwardGyro_gyroAngle > maximumError)
-				maximumError = forwardGyro_gyroAngle;
-			SmartDashboard.putNumber("Maximum Error", maximumError);
-			SmartDashboard.putNumber("Minimum Error", minimumError);
-			if (forwardGyro_gyroAngle > 1.0 || forwardGyro_gyroAngle < -1.0) {
-				Robot.drivebase.drive(autoGyroDriveSpeed[0] + forwardGyro_gyroAngle,
-						autoGyroDriveSpeed[1] - forwardGyro_gyroAngle);
-				SmartDashboard.putBoolean("Adjusting straightness", true);
-			} else {
-				SmartDashboard.putBoolean("Adjusting straightness", false);
-				Robot.drivebase.drive(autoGyroDriveSpeed[0], autoGyroDriveSpeed[1]);
-			}
-		} else {
-			if (!forwardGyro_turn) {
-				forwardGyro_turn = true;
-				Robot.drivebase.drive(0, 0);
-				forwardGyro_turnAngle = -28.0;
-				SmartDashboard.putNumber("Turn angle", forwardGyro_turnAngle);
-
-			}
-			// SmartDashboard.putNumber("Turn Counter", 0);
-		}
-
-		if (forwardGyro_turn && !forwardGyro_turnTimed) {
-			forwardGyro_counter += 1;
-			if (Robot.gyro.getAngle() > forwardGyro_turnAngle - 3) {
-				Robot.drivebase.drive(-autoGyroDriveSpeed[0], autoGyroDriveSpeed[1]);
-				SmartDashboard.putString("Angle Direction", "right");
-			} else {
-				// please murder me
-				forwardGyro_turnTime = System.currentTimeMillis() + 1000;
-				SmartDashboard.putNumber("Gyro afterTurn", Robot.gyro.getAngle());
-				SmartDashboard.putNumber("timeAfterTurn", System.currentTimeMillis());
-				SmartDashboard.putNumber("turnTime", forwardGyro_turnTime);
-				forwardGyro_turnTimed = true;
-				SwitchCase.shotTheBall = false;
-
-			}
-		}
-
-		if (forwardGyro_turnTimed && !forwardGyro_shoot) {
-			forwardGyro_counter++;
-			SmartDashboard.putNumber("Turn Counter", forwardGyro_counter);
-
-			if (System.currentTimeMillis() < forwardGyro_turnTime) {
-				Robot.drivebase.drive(-0.90, 0.90);
-				/*
-				 * if(Robot.gyro.getAngle() > forwardGyro_turnAngle - 3){
-				 * Robot.drivebase.drive(0.7, -0.7); SmartDashboard.putString(
-				 * "Angle Direction", "right"); } else if(Robot.gyro.getAngle()
-				 * < forwardGyro_turnAngle + 3){ Robot.drivebase.drive(-.7, .7);
-				 * //Robot.drivebase.drive(0.0, 0.0); SmartDashboard.putString(
-				 * "Angle Direction", "left"); } else{
-				 * Robot.drivebase.drive(0.0, 0.0); SmartDashboard.putNumber(
-				 * "Gyro afterTurn", Robot.gyro.getAngle());
-				 * SmartDashboard.putNumber("timeAfterTurn",
-				 * System.currentTimeMillis()); //forwardGyro_shoot = true;
-				 * SwitchCase.shotTheBall = false; }
-				 */
-			} else {
-				Robot.drivebase.drive(0.0, 0.0);
-				forwardGyro_shoot = true;
-			}
-		}
-
-		if (forwardGyro_turn && forwardGyro_shoot && !forwardGyro_intake && !forwardGyro_startFly) {
-
-			// SmartDashboard.putNumber(key, value);
-			Robot.flywheels.setFlywheelSpeed(shootPower);
-			SmartDashboard.putNumber("timeAfterStart", System.currentTimeMillis());
-			SmartDashboard.putNumber("Gyro beforeSpinUp", Robot.gyro.getAngle());
-			forwardGyro_startFly = true;
-		}
-
-		if (forwardGyro_startFly && !forwardGyro_intake) {
-			// currentRPM = {0.0, 0.0};
-			double[] currentRPM = Robot.flywheels.getRPM();
-			if ((currentRPM[0] <= shootPower[0] * 1.05 && currentRPM[0] >= shootPower[0] * .95)
-					|| (currentRPM[1] <= shootPower[1] * 1.1 && currentRPM[1] >= shootPower[1] * .9)) {
-				forwardGyro_neededTime = System.currentTimeMillis() + 750;
-				forwardGyro_intake = true;
-			}
-		}
-
-		if (forwardGyro_intake) {
-			if (System.currentTimeMillis() >= forwardGyro_neededTime) {
-				Robot.flywheels.setIntakeSpeed(0.0);
-				Robot.flywheels.setFlywheelSpeed(off);
-			} else
-				Robot.flywheels.setIntakeSpeed(1.0);
-		}
-	}
-
 	
 	/**
 	 * Updates the state of various autonomous functions. This must be called in
@@ -585,154 +313,7 @@ public class Autonomous {
 			touchForward();
 			break;
 		case CrossOuter:
-			//SmartDashboard.putNumber("navexState", navexLowbarShoot);
-			double[] shootSpeed = {3310, 3310};
-			switch(navexLowbarShoot)
-			{
-			default:
-				break;
-			case 0:
-				Robot.drivebase.resetDrive();
-				//Robot.drivebase.enablePIDCTurn(45);
-				SmartDashboard.putBoolean("OnTarget", Robot.drivebase.driveController.onTarget());
-				SmartDashboard.putNumber("GetError", Robot.drivebase.driveController.getError());
-				SmartDashboard.putNumber("GetAvgError", Robot.drivebase.driveController.getAvgError());
-				Robot.drivebase.enablePIDCDrive(-0.65, -0.85f, -0.45f);
-				navexLowbarShoot = 1;
-				break;
-			case 1:
-				//Robot.drivebase.frontleft.set(-0.4);
-				driveDistance = Robot.drivebase.getEncDistance();
-				if ((driveDistance[0] > (forwardGyro_barelyCross) || driveDistance[1] > (forwardGyro_barelyCross)))
-				{
-					//Robot.drivebase.disablePIDC();
-					//Robot.drivebase.drive(0, 0);
-					Robot.drivebase.enablePIDCTurn(36);
-					Robot.flywheels.setFlywheelSpeed(shootSpeed);
-					navexLowbarShoot = 3;
-				}
-				break;
-			case 2://SKIPPED
-				if(!Robot.drivebase.ahrs.isRotating() || !Robot.drivebase.ahrs.isMoving())//Math.abs(50 - Robot.drivebase.ahrs.getYaw()) <= 15 && 
-				{
-					//SwitchCase.checkAmount = 1;
-					//SwitchCase.shotTheBall = false;
-					
-					//currAIM = SwitchCase.autoAim(1);
-					//Timer.delay(.5);
-					navexLowbarShoot = 4;
-				}
-				SmartDashboard.putBoolean("isMoving", Robot.drivebase.ahrs.isMoving());
-				SmartDashboard.putBoolean("isRotating", Robot.drivebase.ahrs.isRotating());
-				SmartDashboard.putBoolean("OnTarget", Robot.drivebase.driveController.onTarget());
-				SmartDashboard.putNumber("GetError", Robot.drivebase.driveController.getError());
-				SmartDashboard.putNumber("GetAvgError", Robot.drivebase.driveController.getAvgError());
-				
-				break;
-			case 3:
-				
-				//Robot.flywheels.setFlywheelSpeed(shootSpeed);
-				FlyWheelTimer = System.currentTimeMillis() + 1500;
-				SmartDashboard.putNumber("FlywheelTimer", FlyWheelTimer);
-				//SmartDashboard.putNumber("VisionManVals", Vision.manVals[0]);
-				//SmartDashboard.putString("READY READY READY", "Auto aiming");
-//				currAIM = SwitchCase.autoAim(currAIM);
-//				if ((currAIM == 0 || currAIM == -1) && !SwitchCase.shotTheBall) {
-//					currAIM = 1;
-//				}
-//				//Robot.flywheels.setFlywheelSpeed(shootSpeed);
-				navexLowbarShoot = 4;
-				break;
-			
-			case 4:
-				
-				SmartDashboard.putNumber("SysTime", System.currentTimeMillis());
-				if(System.currentTimeMillis() >= FlyWheelTimer){
-					Robot.drivebase.disablePIDC();
-					double[] currentRPM = Robot.flywheels.getRPM();
-					if ((currentRPM[0] <= shootSpeed[0] * 1.05 && currentRPM[0] >= shootSpeed[0] * .95)
-							|| (currentRPM[1] <= shootSpeed[1] * 1.1 && currentRPM[1] >= shootSpeed[1] * .9)) {
-						forwardGyro_neededTime = System.currentTimeMillis() + 750;
-						navexLowbarShoot = 5;
-					}
-				}
-				break;
-			case 5:
-				if (System.currentTimeMillis() >= forwardGyro_neededTime) {
-					Robot.flywheels.setIntakeSpeed(0.0);
-					Robot.flywheels.setFlywheelSpeed(off);
-					Robot.drivebase.disablePIDC();
-					navexLowbarShoot = 6;
-				} else
-					Robot.flywheels.setIntakeSpeed(1.0);
-				break;
-			case 6://Dead state
-				SmartDashboard.putBoolean("isMoving", Robot.drivebase.ahrs.isMoving());
-				SmartDashboard.putBoolean("isRotating", Robot.drivebase.ahrs.isRotating());
-				SmartDashboard.putBoolean("OnTarget", Robot.drivebase.driveController.onTarget());
-				SmartDashboard.putNumber("GetError", Robot.drivebase.driveController.getError());
-				SmartDashboard.putNumber("GetAvgError", Robot.drivebase.driveController.getAvgError());
-				break;
-			}
-			// crossForward();
-			//driveForwardGyro();
-			
-			/*
-			forwardGyro_turnAngle=-90;
-			//forwardGyro_turnTimed=false;
-//			final double rampRate = -0.005;
-			if (!forwardGyro_turnTimed) {
-				forwardGyro_counter += 1;
-				final double percentageThere = Robot.gyro.getAngle()/forwardGyro_turnAngle;
-				ramp[0] = (0.20-(0.20*percentageThere))+0.50;
-				ramp[1]=-ramp[0];
-				final double pid = motorPID(Robot.gyro.getAngle(), forwardGyro_turnAngle);
-				Robot.drivebase.drive(pid, -pid);
-//				ramp[0]-=rampRate;
-//				ramp[1]+=rampRate;
-				if (Robot.gyro.getAngle() > forwardGyro_turnAngle) {
-					SmartDashboard.putNumber("RAMP 0", ramp[0]);
-					SmartDashboard.putNumber("RAMP 1", ramp[1]);
-					SmartDashboard.putString("Angle Direction", "right");
-				} else {
-//					Robot.drivebase.drive(0, 0);
-					// please murder me
-					forwardGyro_turnTime = System.currentTimeMillis() + 1000;
-					SmartDashboard.putNumber("Gyro afterTurn", Robot.gyro.getAngle());
-					SmartDashboard.putNumber("timeAfterTurn", System.currentTimeMillis());
-					SmartDashboard.putNumber("turnTime", forwardGyro_turnTime);
-					forwardGyro_turnTimed = true;
-					SwitchCase.shotTheBall = false;
-
-				}
-			}
-
-			if (forwardGyro_turnTimed) {
-				//forwardGyro_counter++;
-				Robot.drivebase.drive(0, 0);
-				SmartDashboard.putNumber("Turn Counter", forwardGyro_counter);
-
-				if (System.currentTimeMillis() < forwardGyro_turnTime) {
-				//	Robot.drivebase.drive(-0.5, 0.5);
-					/*
-					 * if(Robot.gyro.getAngle() > forwardGyro_turnAngle - 3){
-					 * Robot.drivebase.drive(0.7, -0.7); SmartDashboard.putString(
-					 * "Angle Direction", "right"); } else if(Robot.gyro.getAngle()
-					 * < forwardGyro_turnAngle + 3){ Robot.drivebase.drive(-.7, .7);
-					 * //Robot.drivebase.drive(0.0, 0.0); SmartDashboard.putString(
-					 * "Angle Direction", "left"); } else{
-					 * Robot.drivebase.drive(0.0, 0.0); SmartDashboard.putNumber(
-					 * "Gyro afterTurn", Robot.gyro.getAngle());
-					 * SmartDashboard.putNumber("timeAfterTurn",
-					 * System.currentTimeMillis()); //forwardGyro_shoot = true;
-					 * SwitchCase.shotTheBall = false; }
-					 *//*
-				} else {
-					Robot.drivebase.drive(0.0, 0.0);
-					forwardGyro_shoot = true;
-				}
-			}
-			*/
+			crossForward();
 			break;
 		case CrossMoatAndStop:
 			// moatForward();
@@ -742,7 +323,68 @@ public class Autonomous {
 			crossRockWall();
 			break;
 		case CrossLowbarAndShoot:
-			LowbarShoot();
+			//LowbarShoot();
+			double[] shootSpeed = {3310, 3310};
+			switch(navexLowbarShoot)
+			{
+			default:
+				break;
+			case 0:
+				Robot.drivebase.resetDrive();
+				SmartDashboard.putBoolean("OnTarget", Robot.drivebase.driveController.onTarget());
+				SmartDashboard.putNumber("GetError", Robot.drivebase.driveController.getError());
+				SmartDashboard.putNumber("GetAvgError", Robot.drivebase.driveController.getAvgError());
+				Robot.drivebase.enablePIDCDrive(-0.68, 0.1);
+				navexLowbarShoot = 1;
+				break;
+			case 1:
+				driveDistance = Robot.drivebase.getEncDistance();
+				if ((driveDistance[0] > (forwardGyro_barelyCross) || driveDistance[1] > (forwardGyro_barelyCross)))
+				{
+					Robot.drivebase.enablePIDCTurn(37);
+					Robot.flywheels.setFlywheelSpeed(shootSpeed);
+					navexLowbarShoot = 2;
+				}
+				break;
+			case 2:
+				FlyWheelTimer = System.currentTimeMillis() + 3000;
+				//SmartDashboard.putNumber("VisionManVals", Vision.manVals[0]);
+				//SmartDashboard.putString("READY READY READY", "Auto aiming");
+//				currAIM = SwitchCase.autoAim(currAIM);
+//				if ((currAIM == 0 || currAIM == -1) && !SwitchCase.shotTheBall) {
+//					currAIM = 1;
+//				}
+//				//Robot.flywheels.setFlywheelSpeed(shootSpeed);
+				navexLowbarShoot = 3;
+				break;
+			case 3:
+				if(System.currentTimeMillis() >= FlyWheelTimer){
+					Robot.drivebase.disablePIDC();
+					double[] currentRPM = Robot.flywheels.getRPM();
+					if ((currentRPM[0] <= shootSpeed[0] * 1.02 && currentRPM[0] >= shootSpeed[0] * .98)
+							|| (currentRPM[1] <= shootSpeed[1] * 1.02 && currentRPM[1] >= shootSpeed[1] * .98)) {
+						forwardGyro_neededTime = System.currentTimeMillis() + 750;
+						Robot.flywheels.setIntakeSpeed(1.0);
+						navexLowbarShoot = 4;
+					}
+				}
+				break;
+			case 4:
+				if (System.currentTimeMillis() >= forwardGyro_neededTime) {
+					Robot.flywheels.setIntakeSpeed(0.0);
+					Robot.flywheels.setFlywheelSpeed(off);
+					Robot.drivebase.disablePIDC();
+					navexLowbarShoot = 5;
+				} 
+				break;
+			case 5://Dead state
+				SmartDashboard.putBoolean("isMoving", Robot.drivebase.ahrs.isMoving());
+				SmartDashboard.putBoolean("isRotating", Robot.drivebase.ahrs.isRotating());
+				SmartDashboard.putBoolean("OnTarget", Robot.drivebase.driveController.onTarget());
+				SmartDashboard.putNumber("GetError", Robot.drivebase.driveController.getError());
+				SmartDashboard.putNumber("GetAvgError", Robot.drivebase.driveController.getAvgError());
+				break;
+			}
 			break;
 		case Spybox:
 			spyboxShoot();
@@ -754,6 +396,8 @@ public class Autonomous {
 			PorticShoot();
 			break;
 		case DoNothing:
+			Timer.delay(0.1);
+			break;
 		default:
 			Timer.delay(0.1);
 			break;

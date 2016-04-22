@@ -65,6 +65,7 @@ public class Robot extends IterativeRobot {
     	currentAuto = AutoTask.valueOf(SmarterDashboard.getString("AUTO-SELECTED", "AutoShoot"));
  		SmartDashboard.putString("Auto Selected: ", currentAuto.toString());
  		drivebase.resetDrive();
+ 		auton.navexLowbarShoot = 0;
  		//drivebase.ahrs.zeroYaw();
  		//drivebase.ahrs.reset();
  		//drivebase.setRampRate(12);
