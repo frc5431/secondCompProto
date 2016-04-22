@@ -104,7 +104,7 @@ public class Robot extends IterativeRobot {
     	
     }
     public void teleopInit(){
-    	drivebase.disableBrakeMode();
+    	drivebase.enableBrakeMode();
     	drivebase.resetDrive();
     	drivebase.setRampRate(0);
     	Robot.drivebase.disablePIDC();
