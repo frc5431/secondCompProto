@@ -11,9 +11,11 @@ public class SwitchCase {
 	static Vision cameraVision = new Vision();
 	private static boolean pass = false;
 	public final static int abortAutoAim = -42; // Get the joke, anyone?
-	private static long autoAimTimer = 0;
+	private static long autoshootTimer = 0;
+	private static long autoAimTurnTimer = 0;
 	private static long autoAimIntakeTimer = 0;
 	private static long autoAimManualTimer = 0;
+	private static long shootTimer = 0;
 	// private static int autoAimRemoteState = 0; //Used for the shoot()
 	// function within autoAim()
 	private static final int[] off = { 0, 0 };
@@ -23,6 +25,8 @@ public class SwitchCase {
 	private static int timesCount = 0;
 	public static boolean shotTheBall = false;
 	private static final double percentRange = 0.02;
+	
+	
 	
 	private static final int minVal = -80, maxVal = 80;
 	public SwitchCase() {
@@ -199,7 +203,7 @@ public class SwitchCase {
 			state = 5;
 			break;
 		case 5:
-			autoAimTimer = System.currentTimeMillis() + 3000;
+			autoshootTimer = System.currentTimeMillis() + 3000;
 			state = 6;
 			// have to make this better, made into 4 states:
 			// state 5 is to spin the flywheels
@@ -219,7 +223,7 @@ public class SwitchCase {
 			final int[] speeds3 = { shootSpeed, shootSpeed };
 			final int marginOfError = (int) (speeds3[0] * percentRange);
 			Robot.flywheels.setPIDSpeed(speeds3);
-			if (System.currentTimeMillis() >= autoAimTimer && ((currentRPM[0] <= speeds3[0] + marginOfError
+			if (System.currentTimeMillis() >= autoshootTimer && ((currentRPM[0] <= speeds3[0] + marginOfError
 					&& currentRPM[0] >= speeds3[0] - marginOfError)
 					|| (currentRPM[1] <= speeds3[1] + marginOfError && currentRPM[1] >= speeds3[1] - marginOfError))) {
 				state = 8;
@@ -252,13 +256,45 @@ public class SwitchCase {
 			break;
 		case 12:
 			cameraVision.Update();
+			Robot.drivebase.autoAimController.reset();
 			Robot.drivebase.autoAimController.enable();
-			state = 13;
+			autoAimTurnTimer = System.currentTimeMillis() + 250;
+			state = -12;
+			break;
+		case -12:
+			if(System.currentTimeMillis() >= autoAimTurnTimer){
+				state = 13;
+			}
 			break;
 		case 13:
 			cameraVision.Update();
+			SmartDashboard.putNumber("fromCenter", Vision.fromCenter);
+			//autoAimTurnTimer = System.currentTimeMillis() + 2500;
+			
+			if(Robot.drivebase.autoAimController.getAvgError() > -Robot.drivebase.aim_kTolerancePixels && Robot.drivebase.autoAimController.getAvgError() < Robot.drivebase.aim_kTolerancePixels) {
+			//if((Vision.fromCenter) > 25 && (Vision.fromCenter) < 40) {
+				SmartDashboard.putBoolean("TARGETLOCK", true);
+				Robot.drivebase.autoAimController.disable();
+				Robot.drivebase.drive(0.0, 0.0);
+				Robot.flywheels.setIntakeSpeed(1);
+				shootTimer = System.currentTimeMillis() + 2500;
+				state = 14;
+			} else {
+				SmartDashboard.putBoolean("TARGETLOCK", false);
+			}
+			break;
+		case 14:
+			//SmartDashboard.putNumber("TIMEAMOUNT", System.currentTimeMillis());
+			if(System.currentTimeMillis() >= shootTimer) {
+				Robot.flywheels.setIntakeSpeed(0);
+				Robot.flywheels.setPIDSpeed(off);
+			} else {
+				Robot.flywheels.setIntakeSpeed(1);
+			}
+			Robot.drivebase.drive(0.0, 0.0);
 			break;
 		case abortAutoAim:
+			
 			SmartDashboard.putString("Bug", "Failed to AutoAim");
 			state = 1;
 			break;
@@ -267,6 +303,7 @@ public class SwitchCase {
 			SmartDashboard.putNumber("STATE STATE STATE", -1);
 			Robot.flywheels.setPIDSpeed(off);
 			Robot.flywheels.setIntakeSpeed(0);
+			Robot.drivebase.autoAimController.disable();
 			state = 0;
 			break;
 		}
@@ -297,14 +334,14 @@ public class SwitchCase {
 			final int toShoot = (int) cameraVision.getRPMS();
 			final int[] woav = {toShoot, toShoot};
 			Robot.flywheels.setPIDSpeed(woav);
-			autoAimTimer = System.currentTimeMillis() + 2500;
+			autoshootTimer = System.currentTimeMillis() + 2500;
 			//Robot.flywheels.leftFW.setVoltageRampRate(1);
 			//Robot.flywheels.rightFW.setVoltageRampRate(1);
 
 			state = 2;
 		case 2:
 			SmartDashboard.putNumber("shootBug", System.currentTimeMillis());
-			SmartDashboard.putNumber("shootBug2", autoAimTimer);
+			SmartDashboard.putNumber("shootBug2", autoshootTimer);
 
 			final double[] curRPM = Robot.flywheels.getRPM();
 			final int speedsTwo = (int) cameraVision.getRPMS();
@@ -326,7 +363,7 @@ public class SwitchCase {
 				 * if(passedTimes < 4) { Timer.delay(0.1); passedTimes += 1; }
 				 * else {
 				 */
-				// if(System.currentTimeMillis() >= autoAimTimer){]
+				// if(System.currentTimeMillis() >= autoshootTimer){]
 				/*final double newSpeed[] = { newPower[0] - 0.1, // + 0.009 +
 																// (SmarterDashboard.getNumber("OVERDRIVE",
 																// 0.0) /10),

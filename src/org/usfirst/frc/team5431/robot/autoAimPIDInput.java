@@ -10,7 +10,7 @@ public class autoAimPIDInput implements PIDSource{
 		// TODO Auto-generated method stub
 		SmartDashboard.putNumber("VisionFromCenter", -Vision.fromCenter);
 		SmartDashboard.putNumber("VisionFromCenterAdjusted", -Vision.fromCenter + 32);
-		SmartDashboard.putNumber("Indicator", System.currentTimeMillis());
+		//SmartDashboard.putNumber("Indicator", System.currentTimeMillis());
 		return -Vision.fromCenter + 32;
 	}
 

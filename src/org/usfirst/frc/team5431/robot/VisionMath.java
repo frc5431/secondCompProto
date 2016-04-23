@@ -11,7 +11,7 @@ public class VisionMath {
 	public static final double screenHalf = 160, minDistance = 76, maxDistance = 150, leftTrig = 33,//COMP : 29,
 			/* This is actually the right */ rightTrig = 35;//COMP : 35; // this is actually the left
 
-	private static final double maxArea = 200, maxSolidity = 100;
+	private static final double maxArea = 1500, maxSolidity = 100;
 
 	public static volatile double override = 0.0;
 

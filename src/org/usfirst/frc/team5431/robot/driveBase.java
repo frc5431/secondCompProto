@@ -47,7 +47,7 @@ public class driveBase {
 	static final double aim_kI = 0.00002;
 	static final double aim_kD = 0.15;
 	static final double aim_kF = 0.04;
-	static final double aim_kTolerancePixels = 2;
+	static final double aim_kTolerancePixels = 10;
 	
 	public static CANTalon frontright; // Declaration
 	public static CANTalon frontleft;
@@ -130,13 +130,13 @@ public class driveBase {
 		ahrs = new AHRS(SPI.Port.kMXP);
 		pidOutput = new autonPIDOutput();
 		autoAimOutput = new autonPIDOutput();
-		autoAimOutput.stall = 0.2;
+		autoAimOutput.stall = 0.35;
 		autoAimInput = new autoAimPIDInput();
 		autoAimController = new PIDController(aim_kP, aim_kI, aim_kD, aim_kF, autoAimInput, pidOutput);
 		autoAimController.setInputRange(-180.0f,  180.0f);
 		autoAimController.setAbsoluteTolerance(aim_kTolerancePixels);
-		autoAimController.setOutputRange(-.5f, .5f);
-		
+		autoAimController.setOutputRange(-.8f, .8f);
+		autoAimController.setToleranceBuffer(20);
 		
 		driveController = new PIDController(kP, kI, kD, kF, ahrs, pidOutput);
 	    driveController.setInputRange(-180.0f,  180.0f);

@@ -109,7 +109,7 @@ public class Teleop {
 		
 		//if(input.xboxYVal) Robot.flywheels.climb(); //Climb the tower
 		if(input.joystickTriggerVal && currentAutoAimState == 0) currentShootState = 1;//&& currentAutoAimState == 0) 
-		if(input.joystickButton4 && currentShootState == 0) currentAutoAimState = 1;
+		if(input.joystickButton4 && currentShootState == 0) currentAutoAimState = 11;
 		if(input.joystickButton5 || input.joystickButton11){
 			currentAutoAimState = -1;
 			currentShootState = -1;

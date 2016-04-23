@@ -24,6 +24,7 @@ public class Robot extends IterativeRobot {
 	static AutoTask currentAuto;
 	static AnalogGyro gyro;
 	private static final double gyroSensitiviy=0.001661;
+
 	public static final boolean brakeMode = false;    
 	public static double startGyroAngle;
     /**
@@ -59,14 +60,15 @@ public class Robot extends IterativeRobot {
 	 * If using the SendableChooser make sure to add them to the chooser code above as well.
 	 */
     public void autonomousInit() {
-    	startGyroAngle=drivebase.ahrs.getYaw();
+    	
     	drivebase.enableBrakeMode();
     	SmarterDashboard.putBoolean("AUTO", true);
     	currentAuto = AutoTask.valueOf(SmarterDashboard.getString("AUTO-SELECTED", "AutoShoot"));
  		SmartDashboard.putString("Auto Selected: ", currentAuto.toString());
  		drivebase.resetDrive();
  		auton.navexLowbarShoot = 0;
- 		//drivebase.ahrs.zeroYaw();
+ 		drivebase.ahrs.zeroYaw();
+ 		startGyroAngle=drivebase.ahrs.getYaw();
  		//drivebase.ahrs.reset();
  		//drivebase.setRampRate(12);
     }
@@ -100,6 +102,7 @@ public class Robot extends IterativeRobot {
 		SmarterDashboard.putNumber("FLY-LEFT", rpms[0]);
 		SmarterDashboard.putNumber("FLY-RIGHT", rpms[1]);
 		SmartDashboard.putBoolean("NAVX CALIBRATING", drivebase.ahrs.isCalibrating());
+		
     	//Timer.delay(0.005); // Wait 50 Hz
     	//SmarterDashboard.periodic();
     	
