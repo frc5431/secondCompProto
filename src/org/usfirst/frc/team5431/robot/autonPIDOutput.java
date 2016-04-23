@@ -7,7 +7,7 @@ import org.usfirst.frc.team5431.robot.driveBase;
 
 public class autonPIDOutput implements PIDOutput{
 	
-	private double stall = 0.3;
+	public double stall = 0.3;
 	
 	public void pidWrite(double output){
 		

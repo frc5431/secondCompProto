@@ -72,6 +72,7 @@ public class Robot extends IterativeRobot {
     }
     
     public void disabledPeriodic(){
+    	drivebase.disableBrakeMode();
     	SmarterDashboard.putBoolean("AUTO", false);
     	SmarterDashboard.putBoolean("ENABLED", false);
     	SmarterDashboard.putBoolean("connection", true);
@@ -108,7 +109,7 @@ public class Robot extends IterativeRobot {
     	drivebase.resetDrive();
     	drivebase.setRampRate(0);
     	Robot.drivebase.disablePIDC();
-    	gyro.reset();
+    	Robot.drivebase.ahrs.reset();;
     }
     /**
      * This function is called periodically during operator control.
@@ -118,7 +119,7 @@ public class Robot extends IterativeRobot {
     	//SwitchCase.moveAmount = 0.468;
         oiInput.updateVals();
         teleop.Update(oiInput);
-        SmartDashboard.putNumber("Gyro Angle", gyro.getAngle());
+        SmartDashboard.putNumber("Gyro Angle", Robot.drivebase.ahrs.getYaw());
         
         //Update connection
         SmarterDashboard.putBoolean("ENABLED", true);

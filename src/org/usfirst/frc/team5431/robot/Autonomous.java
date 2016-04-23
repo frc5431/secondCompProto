@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * @author Usaid Malik
  */
 public class Autonomous {
-
+	private double gyroTurnAngle = 0;
 	public static int driveForwardState = 0;
 	private int driveForwardGyroState = 0;
 	private int touchForwardState = 0;
@@ -22,6 +22,7 @@ public class Autonomous {
 	public static boolean autoAIMState = false;
 	public static boolean seeOnlyTowerState = false;
 	private static long forwardGyro_neededTime = 0;
+	private static long forwardGyro_landTime = 0;
 	private static long FlyWheelTimer = 0;
 	public static int currAIM = 1;
 	private long crossMoatTimer = 0;
@@ -31,7 +32,7 @@ public class Autonomous {
 	private final double[] speedToOuterWork = { 0.65, 0.65 }, speedToCrossMoat = { 1, 1 };
 
 	private static final double distanceToOuterWork = 48, distanceToCrossWork = 135, // 128
-			distanceToCrossRough = 130, distanceToSeeOnlyTower = 12, forwardGyro_barelyCross = 122;// 122
+			distanceToCrossRough = 130, distanceToSeeOnlyTower = 12, forwardGyro_barelyCross = 122, forwardGyro_barelyRough = 132;// 122
 
 	public static enum FirstMove {
 		StandStill, TouchOuterWork, Lowbar, RockWall, RoughTerrain, Portcullis, ChevalDeFrise, Moat;
@@ -94,12 +95,12 @@ public class Autonomous {
 				// SwitchCase.moveAmount = 0.43;
 				SwitchCase.checkAmount = 1;
 				SwitchCase.shotTheBall = false;
-				currAIM = SwitchCase.autoAim(currAIM);
+				currAIM = SwitchCase.autoAim(currAIM, 3350);
 			}
 			if (autoAIMState) {
 
 				SmartDashboard.putString("READY READY READY", "Auto aiming");
-				currAIM = SwitchCase.autoAim(currAIM);
+				currAIM = SwitchCase.autoAim(currAIM, 3350);
 				if ((currAIM == 0 || currAIM == -1) && !SwitchCase.shotTheBall) {
 					currAIM = 1;
 				}
@@ -135,12 +136,12 @@ public class Autonomous {
 				// SwitchCase.moveAmount = 0.43;
 				SwitchCase.checkAmount = 1;
 				SwitchCase.shotTheBall = false;
-				currAIM = SwitchCase.autoAim(currAIM);
+				currAIM = SwitchCase.autoAim(currAIM, 3350);
 			}
 		}
 		if (autoAIMState) {
 			SmartDashboard.putString("READY READY READY", "Auto aiming");
-			currAIM = SwitchCase.autoAim(currAIM);
+			currAIM = SwitchCase.autoAim(currAIM, 3350);
 			if ((currAIM == 0 || currAIM == -1) && !SwitchCase.shotTheBall) {
 				currAIM = 1;
 			}
@@ -206,7 +207,7 @@ public class Autonomous {
 
 		if (autoAIMState) {
 			SmartDashboard.putString("READY READY READY", "Auto aiming");
-			currAIM = SwitchCase.autoAim(currAIM);
+			currAIM = SwitchCase.autoAim(currAIM, 3350);
 			if ((currAIM == 0 || currAIM == -1) && !SwitchCase.shotTheBall) {
 				currAIM = 1;
 			}
@@ -274,11 +275,11 @@ public class Autonomous {
 			// SwitchCase.moveAmount = 0.43;
 			SwitchCase.checkAmount = 1;
 			SwitchCase.shotTheBall = false;
-			currAIM = SwitchCase.autoAim(currAIM);
+			currAIM = SwitchCase.autoAim(currAIM, 3350);
 		}
 		if (autoAIMState) {
 			SmartDashboard.putString("READY READY READY", "Auto aiming");
-			currAIM = SwitchCase.autoAim(currAIM);
+			currAIM = SwitchCase.autoAim(currAIM, 3350);
 			if ((currAIM == 0 || currAIM == -1) && !SwitchCase.shotTheBall) {
 				currAIM = 1;
 			}
@@ -324,7 +325,8 @@ public class Autonomous {
 			break;
 		case CrossLowbarAndShoot:
 			//LowbarShoot();
-			double[] shootSpeed = {3310, 3310};
+			gyroTurnAngle = 37;
+			double[] shootSpeedLowbar = {3310, 3310};
 			switch(navexLowbarShoot)
 			{
 			default:
@@ -342,7 +344,7 @@ public class Autonomous {
 				if ((driveDistance[0] > (forwardGyro_barelyCross) || driveDistance[1] > (forwardGyro_barelyCross)))
 				{
 					Robot.drivebase.enablePIDCTurn(37);
-					Robot.flywheels.setFlywheelSpeed(shootSpeed);
+					Robot.flywheels.setFlywheelSpeed(shootSpeedLowbar);
 					navexLowbarShoot = 2;
 				}
 				break;
@@ -361,8 +363,8 @@ public class Autonomous {
 				if(System.currentTimeMillis() >= FlyWheelTimer){
 					Robot.drivebase.disablePIDC();
 					double[] currentRPM = Robot.flywheels.getRPM();
-					if ((currentRPM[0] <= shootSpeed[0] * 1.02 && currentRPM[0] >= shootSpeed[0] * .98)
-							|| (currentRPM[1] <= shootSpeed[1] * 1.02 && currentRPM[1] >= shootSpeed[1] * .98)) {
+					if ((currentRPM[0] <= shootSpeedLowbar[0] * 1.02 && currentRPM[0] >= shootSpeedLowbar[0] * .98)
+							|| (currentRPM[1] <= shootSpeedLowbar[1] * 1.02 && currentRPM[1] >= shootSpeedLowbar[1] * .98)) {
 						forwardGyro_neededTime = System.currentTimeMillis() + 750;
 						Robot.flywheels.setIntakeSpeed(1.0);
 						navexLowbarShoot = 4;
@@ -390,7 +392,97 @@ public class Autonomous {
 			spyboxShoot();
 			break;
 		case CrossRockwallAndShoot:
-			shootRockWall();
+			//shootRockWall();		//Position 1 - 25
+			gyroTurnAngle = 25;//Position 2 - 16.5
+			double[] shootSpeedMiddle = {3730, 3730};
+			switch(navexLowbarShoot)
+			{
+			default:
+				break;
+			case 0:
+				Robot.drivebase.resetDrive();
+				SmartDashboard.putBoolean("OnTarget", Robot.drivebase.driveController.onTarget());
+				SmartDashboard.putNumber("GetError", Robot.drivebase.driveController.getError());
+				SmartDashboard.putNumber("GetAvgError", Robot.drivebase.driveController.getAvgError());
+				//Robot.drivebase.enablePIDCDrive(-1, 0.001);
+				navexLowbarShoot = 6;
+				break;
+			case 1:
+				driveDistance = Robot.drivebase.getEncDistance();
+				if ((driveDistance[0] > (forwardGyro_barelyCross) || driveDistance[1] > (forwardGyro_barelyCross)))
+				{
+					
+					Robot.drivebase.disablePIDC();
+					driveBase.drive(0, 0);
+					forwardGyro_landTime = System.currentTimeMillis() + 3000;
+					navexLowbarShoot = -2;
+				}
+				break;
+			case -2:
+				if(System.currentTimeMillis() >= forwardGyro_landTime)
+				{
+					Robot.drivebase.resetDrive();
+					Robot.drivebase.enablePIDCDrive(-0.68, 0.2);
+					navexLowbarShoot = -3;
+				}
+				break;
+			case -3:
+				driveDistance = Robot.drivebase.getEncDistance();
+				if((driveDistance[0] > (20) || driveDistance[1] > (20)))
+				{
+					Robot.drivebase.enablePIDCTurn(gyroTurnAngle);
+					
+					navexLowbarShoot = 6;//2 for no autoAim, 6 for autoAim
+				} 
+				break;
+			case 2:
+				Robot.flywheels.setFlywheelSpeed(shootSpeedMiddle);
+				FlyWheelTimer = System.currentTimeMillis() + 2000;
+				//SmartDashboard.putNumber("VisionManVals", Vision.manVals[0]);
+				//SmartDashboard.putString("READY READY READY", "Auto aiming");
+				
+				//Robot.flywheels.setFlywheelSpeed(shootSpeed);
+				navexLowbarShoot = 3;
+				break;
+			case 3:
+				if(System.currentTimeMillis() >= FlyWheelTimer){
+					Robot.drivebase.disablePIDC();
+					double[] currentRPM = Robot.flywheels.getRPM();
+					if ((currentRPM[0] <= shootSpeedMiddle[0] * 1.02 && currentRPM[0] >= shootSpeedMiddle[0] * .98)
+							|| (currentRPM[1] <= shootSpeedMiddle[1] * 1.02 && currentRPM[1] >= shootSpeedMiddle[1] * .98)) {
+						forwardGyro_neededTime = System.currentTimeMillis() + 750;
+						Robot.flywheels.setIntakeSpeed(1.0);
+						navexLowbarShoot = 4;
+					}
+				}
+				break;
+			case 4:
+				if (System.currentTimeMillis() >= forwardGyro_neededTime) {
+					Robot.flywheels.setIntakeSpeed(0.0);
+					Robot.flywheels.setFlywheelSpeed(off);
+					Robot.drivebase.disablePIDC();
+					navexLowbarShoot = 5;
+				} 
+				break;
+			case 5://Dead state
+				SmartDashboard.putBoolean("isMoving", Robot.drivebase.ahrs.isMoving());
+				SmartDashboard.putBoolean("isRotating", Robot.drivebase.ahrs.isRotating());
+				SmartDashboard.putBoolean("OnTarget", Robot.drivebase.driveController.onTarget());
+				SmartDashboard.putNumber("GetError", Robot.drivebase.driveController.getError());
+				SmartDashboard.putNumber("GetAvgError", Robot.drivebase.driveController.getAvgError());
+				break;
+			case 6://autoAim case
+				Timer.delay(0.1);//For the camera and GRIP to update NetworkTables
+				SwitchCase.checkAmount = 1;
+				SwitchCase.shotTheBall = false;
+				currAIM = SwitchCase.autoAim(11, 3700);//Start autoAim
+				navexLowbarShoot = 7;
+				break;
+			case 7:
+				SmartDashboard.putNumber("currAIM", currAIM);
+				currAIM = SwitchCase.autoAim(currAIM, 3700);
+				break;
+			}
 			break;
 		case CrossPortcullisAndShoot:
 			PorticShoot();

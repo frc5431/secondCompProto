@@ -18,7 +18,7 @@ public class SwitchCase {
 	// function within autoAim()
 	private static final int[] off = { 0, 0 };
 	private static boolean inAuto = false;
-	public static final double moveAmount = 0.42;
+	public static final double moveAmount = 0.455;//.42 for comp
 	public static int checkAmount = 3;
 	private static int timesCount = 0;
 	public static boolean shotTheBall = false;
@@ -105,7 +105,7 @@ public class SwitchCase {
 	 * @param state
 	 * @return state
 	 */
-	public static int autoAim(int state) {
+	public static int autoAim(int state, int shootSpeed) {
 		SmartDashboard.putNumber("STATE STATE STATE", state);
 		SmarterDashboard.putBoolean("AUTO", state > 0);
 
@@ -216,7 +216,7 @@ public class SwitchCase {
 			// shootStates = shoot(shootStates, 0.8);
 			// if(shootStates == 0) {state = -1;}
 			final double[] currentRPM = Robot.flywheels.getRPM();
-			final int[] speeds3 = { 3310, 3310 };
+			final int[] speeds3 = { shootSpeed, shootSpeed };
 			final int marginOfError = (int) (speeds3[0] * percentRange);
 			Robot.flywheels.setPIDSpeed(speeds3);
 			if (System.currentTimeMillis() >= autoAimTimer && ((currentRPM[0] <= speeds3[0] + marginOfError
@@ -242,6 +242,21 @@ public class SwitchCase {
 			shotTheBall = true;
 			Robot.flywheels.setPIDSpeed(off);
 			state = -1;
+			break;
+			
+		case 11:
+			cameraVision.Update();
+			final int[] speedsPIDC = { shootSpeed, shootSpeed };
+			//Robot.flywheels.setPIDSpeed(speedsPIDC);
+			state = 12;
+			break;
+		case 12:
+			cameraVision.Update();
+			Robot.drivebase.autoAimController.enable();
+			state = 13;
+			break;
+		case 13:
+			cameraVision.Update();
 			break;
 		case abortAutoAim:
 			SmartDashboard.putString("Bug", "Failed to AutoAim");

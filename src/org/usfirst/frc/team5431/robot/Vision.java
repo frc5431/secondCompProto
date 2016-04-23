@@ -89,7 +89,7 @@ public class Vision {
 			SmarterDashboard.putNumber("HOLE-SOLITIY", holeSolids[toShoot]);
 			area = areas[toShoot];
 			distance = distances[toShoot];
-
+			fromCenter = tempCenter;
 			manVals[1] = (math.withIn(distances[toShoot], VisionMath.minDistance, VisionMath.maxDistance)) ? 0
 					: (distances[toShoot] < VisionMath.minDistance) ? 1 : 2; // Get
 																				// which
