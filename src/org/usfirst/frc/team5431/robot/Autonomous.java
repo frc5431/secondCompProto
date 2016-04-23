@@ -36,7 +36,7 @@ public class Autonomous {
 	public static int stationNumber = 1;
 
 	private static final double distanceToOuterWork = 48, distanceToCrossWork = 135, // 128
-			distanceToCrossRough = 130, distanceToSeeOnlyTower = 12, forwardGyro_barelyCross = 122, forwardGyro_barelyRough = 132;// 122
+			distanceToCrossRough = 130, distanceToSeeOnlyTower = 12, forwardGyro_barelyCross = 122, forwardGyro_barelyRough = 132, forwardGyro_barelyRock = 150;// 122
 
 	public static enum FirstMove {
 		StandStill, TouchOuterWork, Lowbar, RockWall, RoughTerrain, Portcullis, ChevalDeFrise, Moat;
@@ -312,7 +312,7 @@ public class Autonomous {
 		encoderUpdate();
 
 		//SmartDashboard.putString("CURRENT SELECTED", currentAuto.name());
-
+		SmartDashboard.putNumber("NavexState", navexLowbarShoot);
 		switch (currentAuto) {
 		case TouchOuterWork:
 			touchForward();
@@ -408,10 +408,11 @@ public class Autonomous {
 		case Spybox:
 			spyboxShoot();
 			break;
-		case CrossRockwallAndShoot:
+		case CrossRockwallAndShoot:	//Position 4 - -25
+									//Position 3 - -10
 			//shootRockWall();		//Position 1 - 25
-			gyroTurnAngle = 25;//Position 2 - 16.5
-			double[] shootSpeedMiddle = {3730, 3730};
+			gyroTurnAngle = -25;   //Position 2 - 16.5
+			int[] shootSpeedMiddle = {3270, 3270};//Power for 1
 			switch(navexLowbarShoot)
 			{
 			default:
@@ -427,40 +428,45 @@ public class Autonomous {
 				if ((driveDistance[0] > (forwardGyro_barelyCross) || driveDistance[1] > (forwardGyro_barelyCross)))
 				{
 					
-					Robot.drivebase.disablePIDC();
+					Robot.drivebase.driveController.disable();
 					driveBase.drive(0, 0);
 					//Robot.drivebase.ahrs.getYaw();
-					Robot.drivebase.enablePIDCTurn(0);
+					
 					forwardGyro_landTurn = System.currentTimeMillis() + 2000;
 					navexLowbarShoot = -2;
 				}
 				break;
 			case -2:
 				if(System.currentTimeMillis() >= forwardGyro_landTurn) {
-					Robot.drivebase.disablePIDC();
-					forwardGyro_landTime = System.currentTimeMillis() + 2000;
+					
+					Robot.drivebase.resetDrive();
+					Robot.drivebase.enablePIDCDrive(-0.68, 0.2);
 					navexLowbarShoot = -4;
 				}
 				break;
 			case -4:
-				if(System.currentTimeMillis() >= forwardGyro_landTime)
+				driveDistance = Robot.drivebase.getEncDistance();
+				if((driveDistance[0] > (8) || driveDistance[1] > (8)))
 				{
-					Robot.drivebase.resetDrive();
-					Robot.drivebase.enablePIDCDrive(-0.68, 0.2);
-					navexLowbarShoot = -3;
-				}
+					Robot.drivebase.driveController.disable();
+					forwardGyro_landTime = System.currentTimeMillis() + 2000;
+					Robot.drivebase.drive(0.0, 0.0);
+					navexLowbarShoot = -3;//2 for no autoAim, 6 for autoAim
+				} 
+				
 				break;
 			case -3:
-				driveDistance = Robot.drivebase.getEncDistance();
-				if((driveDistance[0] > (48) || driveDistance[1] > (48)))
+				if(System.currentTimeMillis() >= forwardGyro_landTime)
 				{
-					Robot.drivebase.enablePIDCTurn(gyroTurnAngle + 5);
-					
-					navexLowbarShoot = 2;//2 for no autoAim, 6 for autoAim
-				} 
+					Robot.drivebase.enablePIDCTurn(gyroTurnAngle);
+					Robot.flywheels.setPIDSpeed(shootSpeedMiddle);
+					currAIM = SwitchCase.autoAim(11, 3310);
+					FlyWheelTimer = System.currentTimeMillis() + 3000;
+					navexLowbarShoot = 6;
+				}
 				break;
 			case 2:
-				Robot.flywheels.setFlywheelSpeed(shootSpeedMiddle);
+				Robot.flywheels.setPIDSpeed(shootSpeedMiddle);
 				FlyWheelTimer = System.currentTimeMillis() + 2500;
 				//SmartDashboard.putNumber("VisionManVals", Vision.manVals[0]);
 				//SmartDashboard.putString("READY READY READY", "Auto aiming");
@@ -514,15 +520,24 @@ public class Autonomous {
 				
 				break;
 			case 6://autoAim case
-				Timer.delay(0.1);//For the camera and GRIP to update NetworkTables
-				SwitchCase.checkAmount = 1;
-				SwitchCase.shotTheBall = false;
-				currAIM = SwitchCase.autoAim(11, 3700);//Start autoAim
-				navexLowbarShoot = 7;
+				if(System.currentTimeMillis() >= FlyWheelTimer) {
+					Robot.drivebase.disablePIDC();
+					SmartDashboard.putString("CALLEDMAN", "YES");
+					currAIM = SwitchCase.autoAim(currAIM, 3310);
+					if ((currAIM == 0 || currAIM == -1) && !SwitchCase.shotTheBall) {
+						currAIM = 13;
+						SmartDashboard.putString("CALLEDMAN", "RESET");
+					}
+				}
 				break;
 			case 7:
-				SmartDashboard.putNumber("currAIM", currAIM);
-				currAIM = SwitchCase.autoAim(currAIM, 3700);
+				Robot.drivebase.disablePIDC();
+				SmartDashboard.putString("CALLEDMAN", "YES");
+				currAIM = SwitchCase.autoAim(currAIM, 3260);
+				if ((currAIM == 0 || currAIM == -1) && !SwitchCase.shotTheBall) {
+					currAIM = 13;
+					SmartDashboard.putString("CALLEDMAN", "RESET");
+				}
 				break;
 			}
 			break;

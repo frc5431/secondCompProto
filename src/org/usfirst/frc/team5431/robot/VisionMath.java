@@ -117,12 +117,17 @@ public class VisionMath {
 			areas[now] = Math.abs(areas[now]);
 			distances[now] = Math.abs(distances[now]);
 			solidity[now] = Math.abs(solidity[now]);
-			fromCenter[now] = Math.abs(fromCenter[now]);
+			fromCenter[now] = -fromCenter[now];
+			
+			holes[now] = fromCenter[now];//(((areas[now] / maxArea) * areaNum) + ((1 - (distances[now] / maxDistance)) * distNum)
+					//+ ((solidity[now] / maxSolidity) * solidNum) - ((fromCenter[now] / screenHalf) * fromNum)) / 4;
 
-			holes[now] = (((areas[now] / maxArea) * areaNum) + ((1 - (distances[now] / maxDistance)) * distNum)
-					+ ((solidity[now] / maxSolidity) * solidNum) - ((fromCenter[now] / screenHalf) * fromNum)) / 4;
-
-			if (holes[now] > largest) {
+					
+//					if (holes[now] > largest) {
+//						largest = holes[now];
+//						current = now;
+//					}
+			if (holes[now] < largest) {
 				largest = holes[now];
 				current = now;
 			}
