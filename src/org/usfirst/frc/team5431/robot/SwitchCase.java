@@ -16,6 +16,14 @@ public class SwitchCase {
 	private static long autoAimIntakeTimer = 0;
 	private static long autoAimManualTimer = 0;
 	private static long shootTimer = 0;
+	
+	private static long forwardGyro_neededTime = 0;
+	private static long forwardGyro_landTime = 0;
+	private static long forwardGyro_landTurn = 0;
+	private static long FlyWheelTimer = 0;
+	public static int currAIM = 1;
+	private static double[] driveDistance = { 0, 0 };
+	
 	// private static int autoAimRemoteState = 0; //Used for the shoot()
 	// function within autoAim()
 	private static final int[] off = { 0, 0 };
@@ -440,6 +448,137 @@ public class SwitchCase {
 			Robot.flywheels.setIntakeSpeed(0);
 			Robot.flywheels.setPIDSpeed(off);
 			state = 0;
+			break;
+		}
+		return state;
+	}
+	
+	public static int autonomous(int state, double angle, int distance){
+		
+		int[] shootSpeedMiddle = {3270, 3270};//Power for 1
+		switch(state)
+		{
+		default:
+			break;
+		case 1:
+			Robot.drivebase.resetDrive();
+			
+			Robot.drivebase.enablePIDCDrive(-1, 0.001);
+			state = -1;
+			break;
+		case -1:
+			driveDistance = Robot.drivebase.getEncDistance();
+			if ((driveDistance[0] > (distance) || driveDistance[1] > (distance)))
+			{
+				Robot.drivebase.driveController.disable();
+				driveBase.drive(0, 0);
+				//Robot.drivebase.ahrs.getYaw();
+				forwardGyro_landTurn = System.currentTimeMillis() + 2000;
+				state = -2;
+			}
+			break;
+		case -2:
+			if(System.currentTimeMillis() >= forwardGyro_landTurn) {
+				
+				Robot.drivebase.resetDrive();
+				Robot.drivebase.enablePIDCDrive(-0.68, 0.2);
+				state = -4;
+			}
+			break;
+		case -4:
+			driveDistance = Robot.drivebase.getEncDistance();
+			if((driveDistance[0] > (8) || driveDistance[1] > (8)))
+			{
+				Robot.drivebase.driveController.disable();
+				forwardGyro_landTime = System.currentTimeMillis() + 2000;
+				Robot.drivebase.drive(0.0, 0.0);
+				state = -3;//2 for no autoAim, 6 for autoAim
+			} 
+			
+			break;
+		case -3:
+			if(System.currentTimeMillis() >= forwardGyro_landTime)
+			{
+				Robot.drivebase.enablePIDCTurn(angle);
+				Robot.flywheels.setPIDSpeed(shootSpeedMiddle);
+				currAIM = SwitchCase.autoAim(11, 3310);
+				FlyWheelTimer = System.currentTimeMillis() + 3000;
+				state = 6;
+			}
+			break;
+		case 2:
+			Robot.flywheels.setPIDSpeed(shootSpeedMiddle);
+			FlyWheelTimer = System.currentTimeMillis() + 2500;
+			//SmartDashboard.putNumber("VisionManVals", Vision.manVals[0]);
+			//SmartDashboard.putString("READY READY READY", "Auto aiming");
+			currAIM = SwitchCase.autoAim(11, 3310);
+			//FlyWheelTimer = System.currentTimeMillis() + 3000;
+			//Robot.flywheels.setFlywheelSpeed(shootSpeed);
+			state = 3;
+			break;
+			
+		case 3:
+			SmartDashboard.putBoolean("INQUE", true);
+			SmartDashboard.putString("CALLEDMAN", "NO");
+			//SmartDashboard.putNumber("VisionManVals", Vision.manVals[0]);
+			//SmartDashboard.putString("READY READY READY", "Auto aiming");
+			//Timer.delay(2);
+			if(System.currentTimeMillis() >= FlyWheelTimer) {
+				Robot.drivebase.disablePIDC();
+				SmartDashboard.putString("CALLEDMAN", "YES");
+				currAIM = SwitchCase.autoAim(currAIM, 3310);
+				if ((currAIM == 0 || currAIM == -1) && !SwitchCase.shotTheBall) {
+					currAIM = 13;
+					SmartDashboard.putString("CALLEDMAN", "RESET");
+				}
+				
+			}
+			//if(SwitchCase.shotTheBall) state = 4;
+			//Robot.flywheels.setFlywheelSpeed(shootSpeed);
+			//state = 2;
+			break;
+		case 12:
+			if(System.currentTimeMillis() >= FlyWheelTimer){
+				Robot.drivebase.disablePIDC();
+				double[] currentRPM = Robot.flywheels.getRPM();
+				if ((currentRPM[0] <= shootSpeedMiddle[0] * 1.02 && currentRPM[0] >= shootSpeedMiddle[0] * .98)
+						|| (currentRPM[1] <= shootSpeedMiddle[1] * 1.02 && currentRPM[1] >= shootSpeedMiddle[1] * .98)) {
+					forwardGyro_neededTime = System.currentTimeMillis() + 750;
+					Robot.flywheels.setIntakeSpeed(1.0);
+					state = 4;
+				}
+			}
+			break;
+		case 4:
+			if (System.currentTimeMillis() >= forwardGyro_neededTime) {
+				Robot.flywheels.setIntakeSpeed(0.0);
+				Robot.flywheels.setPIDSpeed(off);
+				Robot.drivebase.disablePIDC();
+				state = 5;
+			} 
+			break;
+		case 5://Dead state
+			
+			break;
+		case 6://autoAim case
+			if(System.currentTimeMillis() >= FlyWheelTimer) {
+				Robot.drivebase.disablePIDC();
+				SmartDashboard.putString("CALLEDMAN", "YES");
+				currAIM = SwitchCase.autoAim(currAIM, 3310);
+				if ((currAIM == 0 || currAIM == -1) && !SwitchCase.shotTheBall) {
+					currAIM = 13;
+					SmartDashboard.putString("CALLEDMAN", "RESET");
+				}
+			}
+			break;
+		case 7:
+			Robot.drivebase.disablePIDC();
+			SmartDashboard.putString("CALLEDMAN", "YES");
+			currAIM = SwitchCase.autoAim(currAIM, 3260);
+			if ((currAIM == 0 || currAIM == -1) && !SwitchCase.shotTheBall) {
+				currAIM = 13;
+				SmartDashboard.putString("CALLEDMAN", "RESET");
+			}
 			break;
 		}
 		return state;
