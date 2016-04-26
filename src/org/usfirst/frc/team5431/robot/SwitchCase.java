@@ -544,9 +544,7 @@ public class SwitchCase {
 				}
 				
 			}
-			//if(SwitchCase.shotTheBall) state = 4;
-			//Robot.flywheels.setFlywheelSpeed(shootSpeed);
-			//state = 2;
+			
 			break;
 		case 12:
 			if(System.currentTimeMillis() >= FlyWheelTimer){
@@ -630,6 +628,7 @@ public class SwitchCase {
 			//Start autoAim. Nothing else.
 			currAIM = SwitchCase.autoAim(11, 3310);
 			state = 2;
+			break;
 		case 2:
 			//SmartDashboard.putBoolean("INQUE", true);
 			//SmartDashboard.putString("CALLEDMAN", "NO");
@@ -646,9 +645,7 @@ public class SwitchCase {
 				}
 				
 			}
-			//if(SwitchCase.shotTheBall) state = 4;
-			//Robot.flywheels.setFlywheelSpeed(shootSpeed);
-			//state = 2;
+			
 			break;
 		case 3:
 			if(System.currentTimeMillis() >= FlyWheelTimer){
@@ -726,6 +723,7 @@ public class SwitchCase {
 			//Start autoAim. Nothing else.
 			currAIM = SwitchCase.autoAim(11, 3310);
 			state = 2;
+			break;
 		case 2:
 			//SmartDashboard.putBoolean("INQUE", true);
 			//SmartDashboard.putString("CALLEDMAN", "NO");
@@ -742,9 +740,6 @@ public class SwitchCase {
 				}
 				
 			}
-			//if(SwitchCase.shotTheBall) state = 4;
-			//Robot.flywheels.setFlywheelSpeed(shootSpeed);
-			//state = 2;
 			break;
 		case 3:
 			if(System.currentTimeMillis() >= FlyWheelTimer){
@@ -846,6 +841,7 @@ public class SwitchCase {
 			//Start autoAim. Nothing else.
 			currAIM = SwitchCase.autoAim(11, 3310);
 			state = 2;
+			break;
 		case 2:
 			//SmartDashboard.putBoolean("INQUE", true);
 			//SmartDashboard.putString("CALLEDMAN", "NO");
@@ -862,9 +858,6 @@ public class SwitchCase {
 				}
 				
 			}
-			//if(SwitchCase.shotTheBall) state = 4;
-			//Robot.flywheels.setFlywheelSpeed(shootSpeed);
-			//state = 2;
 			break;
 		case 3:
 			if(System.currentTimeMillis() >= FlyWheelTimer){

@@ -194,7 +194,7 @@ public class Robot extends IterativeRobot {
 //    	Autonomous.autoAIMState = false;
 //    	Autonomous.currAIM = 0;
 //    	Autonomous.driveForwardState = 0;
-    	//SmartDashboard.putNumber("NavX YAW", drivebase.ahrs.getYaw());
+    	SmartDashboard.putNumber("Gyro Angle", drivebase.ahrs.getYaw());
     	
     	//SmartDashboard.putNumber("NavX X", drivebase.ahrs.getRawGyroX());
     	//SmartDashboard.putNumber("NavX Y", drivebase.ahrs.getPitch());
@@ -210,7 +210,7 @@ public class Robot extends IterativeRobot {
     	//auton.updateStates(currentAuto);
     	SmarterDashboard.putBoolean("connection", true);
     	SmarterDashboard.putBoolean("AUTO", true);
-    	//SmartDashboard.putNumber("Gyro Angle", drivebase.ahrs.getYaw());
+    	SmartDashboard.putNumber("Gyro Angle", drivebase.ahrs.getYaw());
     	//Update RPM for fly wheels
         final double[] rpms = flywheels.getRPM();
 		SmarterDashboard.putNumber("FLY-LEFT", rpms[0]);
