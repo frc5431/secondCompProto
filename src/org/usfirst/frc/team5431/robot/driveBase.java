@@ -138,7 +138,7 @@ public class driveBase {
 		autoAimController.setOutputRange(-.8f, .8f);
 		autoAimController.setToleranceBuffer(40);
 		
-		driveController = new PIDController(kP, kI, kD, kF, ahrs, pidOutput);
+		driveController = new PIDController(kP, kI, kD, kF, ahrs, pidOutput, 0.005);
 	    driveController.setInputRange(-180.0f,  180.0f);
 	    //driveController.setOutputRange(0.2f, 0.7f);
 	    driveController.setAbsoluteTolerance(kToleranceDegrees);
