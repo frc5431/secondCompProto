@@ -65,7 +65,7 @@ public class Robot extends IterativeRobot {
     
 	/**
 	 * This autonomous (along with the chooser code above) shows how to select between different autonomous modes
-	 * using the dashboard. The sendable chooser code works with the Java SmartDashboard. If you prefer the LabVIEW
+	 * using the dashboard. The sendable chooser code works with the Java //SmartDashboard. If you prefer the LabVIEW
 	 * Dashboard, remove all of the chooser code and uncomment the getString line to get the auto name from the text box
 	 * below the Gyro
 	 *
@@ -77,7 +77,7 @@ public class Robot extends IterativeRobot {
     	drivebase.enableBrakeMode();
     	SmarterDashboard.putBoolean("AUTO", true);
     	currentAuto = AutoTask.valueOf(SmarterDashboard.getString("AUTO-SELECTED", "Lowbar"));
- 		SmartDashboard.putString("Auto Selected: ", currentAuto.toString());
+ 		//SmartDashboard.putString("Auto Selected: ", currentAuto.toString());
  		drivebase.resetDrive();
  		drivebase.drive(0.0, 0.0);
  		lowbarAutonState= 0;
@@ -88,8 +88,8 @@ public class Robot extends IterativeRobot {
  		
  		startGyroAngle=drivebase.ahrs.getYaw();
  		drivebase.ahrs.reset();
- 		SmartDashboard.putNumber("Init Pitch", drivebase.ahrs.getPitch());
- 		SmartDashboard.putNumber("Init Roll", drivebase.ahrs.getRoll());
+ 		//SmartDashboard.putNumber("Init Pitch", drivebase.ahrs.getPitch());
+ 		//SmartDashboard.putNumber("Init Roll", drivebase.ahrs.getRoll());
  		//drivebase.setRampRate(12);
  		station = (int) SmarterDashboard.getNumber("STATION", 1);//What station the driver selected
 		autoaim = (boolean) SmarterDashboard.getBoolean("AIM-ON", false);//Whether or not to autoAim
@@ -194,12 +194,12 @@ public class Robot extends IterativeRobot {
 //    	Autonomous.autoAIMState = false;
 //    	Autonomous.currAIM = 0;
 //    	Autonomous.driveForwardState = 0;
-    	SmartDashboard.putNumber("NavX YAW", drivebase.ahrs.getYaw());
+    	//SmartDashboard.putNumber("NavX YAW", drivebase.ahrs.getYaw());
     	
-    	SmartDashboard.putNumber("NavX X", drivebase.ahrs.getRawGyroX());
-    	SmartDashboard.putNumber("NavX Y", drivebase.ahrs.getPitch());
-    	SmartDashboard.putNumber("NavX Z", drivebase.ahrs.getRoll());
-    	SmartDashboard.putBoolean("NAVX CALIBRATING", drivebase.ahrs.isCalibrating());
+    	//SmartDashboard.putNumber("NavX X", drivebase.ahrs.getRawGyroX());
+    	//SmartDashboard.putNumber("NavX Y", drivebase.ahrs.getPitch());
+    	//SmartDashboard.putNumber("NavX Z", drivebase.ahrs.getRoll());
+    	//SmartDashboard.putBoolean("NAVX CALIBRATING", drivebase.ahrs.isCalibrating());
     	Timer.delay(0.1); //Sleep a little for little overhead time
     }
 
@@ -210,12 +210,12 @@ public class Robot extends IterativeRobot {
     	//auton.updateStates(currentAuto);
     	SmarterDashboard.putBoolean("connection", true);
     	SmarterDashboard.putBoolean("AUTO", true);
-    	SmartDashboard.putNumber("Gyro Angle", drivebase.ahrs.getYaw());
+    	//SmartDashboard.putNumber("Gyro Angle", drivebase.ahrs.getYaw());
     	//Update RPM for fly wheels
         final double[] rpms = flywheels.getRPM();
 		SmarterDashboard.putNumber("FLY-LEFT", rpms[0]);
 		SmarterDashboard.putNumber("FLY-RIGHT", rpms[1]);
-		SmartDashboard.putBoolean("NAVX CALIBRATING", drivebase.ahrs.isCalibrating());
+		//SmartDashboard.putBoolean("NAVX CALIBRATING", drivebase.ahrs.isCalibrating());
 		
 		autonOtherLowbarState = SwitchCase.autonomous(autonOtherLowbarState, angleToTurnTo, distanceToGoTo, shootSpeed, autoaim);
 		lowbarAutonState = SwitchCase.autonomousLowbar(lowbarAutonState, angleToTurnTo, distanceToGoTo, shootSpeed, autoaim);
@@ -223,12 +223,12 @@ public class Robot extends IterativeRobot {
 		autonChevalState = SwitchCase.autonomousCheval(autonChevalState, angleToTurnTo, distanceToGoTo, shootSpeed, autoaim);
 		//Timer.delay(0.005); // Wait 50 Hz
     	//SmarterDashboard.periodic();
-    	SmartDashboard.putNumber("autonOtherLowbar", autonOtherLowbarState);
-    	SmartDashboard.putNumber("lowbarAutonState", lowbarAutonState);
-    	SmartDashboard.putNumber("autonCheval", autonChevalState);
+    	//SmartDashboard.putNumber("autonOtherLowbar", autonOtherLowbarState);
+    	//SmartDashboard.putNumber("lowbarAutonState", lowbarAutonState);
+    	//SmartDashboard.putNumber("autonCheval", autonChevalState);
     	
-    	SmartDashboard.putNumber("NavX Pitch", drivebase.ahrs.getPitch());
-    	SmartDashboard.putNumber("NavX Roll", drivebase.ahrs.getRoll());
+    	//SmartDashboard.putNumber("NavX Pitch", drivebase.ahrs.getPitch());
+    	//SmartDashboard.putNumber("NavX Roll", drivebase.ahrs.getRoll());
     }
     public void teleopInit(){
     	drivebase.enableBrakeMode();
@@ -245,7 +245,7 @@ public class Robot extends IterativeRobot {
     	//SwitchCase.moveAmount = 0.468;
         oiInput.updateVals();
         teleop.Update(oiInput);
-        SmartDashboard.putNumber("Gyro Angle", Robot.drivebase.ahrs.getYaw());
+        //SmartDashboard.putNumber("Gyro Angle", Robot.drivebase.ahrs.getYaw());
         
         //Update connection
         SmarterDashboard.putBoolean("ENABLED", true);

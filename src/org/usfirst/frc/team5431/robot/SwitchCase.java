@@ -124,7 +124,7 @@ public class SwitchCase {
 	 * @return state
 	 */
 	public static int autoAim(int state, int shootSpeed) {
-		SmartDashboard.putNumber("STATE STATE STATE", state);
+		//SmartDashboard.putNumber("STATE STATE STATE", state);
 		SmarterDashboard.putBoolean("AUTO", state > 0);
 
 		switch (state) {
@@ -136,9 +136,9 @@ public class SwitchCase {
 			//timesCount = 0;
 			break;
 		case 1:
-			//SmartDashboard.putNumber("STATE STATE STATE", state);
-			//SmartDashboard.putNumber("COUNTINGDUDE", timesCount);
-			//SmartDashboard.putBoolean("PASSED?", false);
+			////SmartDashboard.putNumber("STATE STATE STATE", state);
+			////SmartDashboard.putNumber("COUNTINGDUDE", timesCount);
+			////SmartDashboard.putBoolean("PASSED?", false);
 			//timesCount += 1;
 			// If David's autoAim code says to shoot
 			cameraVision.Update();
@@ -155,7 +155,7 @@ public class SwitchCase {
 				state = 1;
 				pass = false;
 			} else {
-				SmartDashboard.putNumber("CRAPSTUFF", Vision.manVals[1]);
+				//SmartDashboard.putNumber("CRAPSTUFF", Vision.manVals[1]);
 			} *//*
 				 * else if (Vision.manVals[0] == 5) {// || Vision.manVals[1] ==
 				 * 5){ } SmarterDashboard.putString("ERROR",
@@ -167,7 +167,7 @@ public class SwitchCase {
 
 			// You get it now, right?
 			if (pass) {
-				//SmartDashboard.putBoolean("PASSED?", true);
+				////SmartDashboard.putBoolean("PASSED?", true);
 
 				Robot.drivebase.enableBrakeMode();
 				if (Vision.manVals[0] == 0) {
@@ -196,11 +196,11 @@ public class SwitchCase {
 			}
 			break;
 		/*
-		 * case 3: cameraVision.Update(); SmartDashboard.putNumber(
+		 * case 3: cameraVision.Update(); //SmartDashboard.putNumber(
 		 * "STATE STATE STATE", state); if(Vision.manVals[1] == 0){
 		 * if(Vision.manVals[0] != 0)//Make sure turn left + right is alright
 		 * state = 2; else{ state = 4; //autoAimRemoteState = 1;
-		 * SmartDashboard.putNumber("remoteBugIn", autoAimRemoteState); } } else
+		 * //SmartDashboard.putNumber("remoteBugIn", autoAimRemoteState); } } else
 		 * if(Vision.manVals[1] == 1){ Robot.drivebase.drive(-0.55, -0.55);
 		 * state = 3; } else if(Vision.manVals[1] == 2){
 		 * Robot.drivebase.drive(.55, .55); state = 3; } else state =
@@ -208,8 +208,8 @@ public class SwitchCase {
 		 */
 		case 4:
 			Robot.drivebase.disableBrakeMode();
-			//SmartDashboard.putNumber("STATE STATE STATE", state);
-			// SmartDashboard.putNumber("remoteBug", autoAimRemoteState);
+			////SmartDashboard.putNumber("STATE STATE STATE", state);
+			// //SmartDashboard.putNumber("remoteBug", autoAimRemoteState);
 			// autoAimRemoteState =
 			// if(autoAimRemoteState == 4)
 			// state = 0;
@@ -251,7 +251,7 @@ public class SwitchCase {
 			break;
 		case 9:
 			Robot.flywheels.setIntakeSpeed(1.0);
-			SmartDashboard.putNumber("Auto Aim Timer", autoAimIntakeTimer);
+			//SmartDashboard.putNumber("Auto Aim Timer", autoAimIntakeTimer);
 			if (System.currentTimeMillis() >= autoAimIntakeTimer) {
 				state = 10;
 			}
@@ -282,23 +282,23 @@ public class SwitchCase {
 			break;
 		case 13:
 			cameraVision.Update();
-			SmartDashboard.putNumber("fromCenter", Vision.fromCenter);
+			//SmartDashboard.putNumber("fromCenter", Vision.fromCenter);
 			//autoAimTurnTimer = System.currentTimeMillis() + 2500;
 			
 			if(Robot.drivebase.autoAimController.getAvgError() > -Robot.drivebase.aim_kTolerancePixels && Robot.drivebase.autoAimController.getAvgError() < Robot.drivebase.aim_kTolerancePixels) {
 			//if((Vision.fromCenter) > 25 && (Vision.fromCenter) < 40) {
-				SmartDashboard.putBoolean("TARGETLOCK", true);
+				//SmartDashboard.putBoolean("TARGETLOCK", true);
 				Robot.drivebase.autoAimController.disable();
 				Robot.drivebase.drive(0.0, 0.0);
 				Robot.flywheels.setIntakeSpeed(1);
 				shootTimer = System.currentTimeMillis() + 2500;
 				state = 14;
 			} else {
-				SmartDashboard.putBoolean("TARGETLOCK", false);
+				//SmartDashboard.putBoolean("TARGETLOCK", false);
 			}
 			break;
 		case 14:
-			//SmartDashboard.putNumber("TIMEAMOUNT", System.currentTimeMillis());
+			////SmartDashboard.putNumber("TIMEAMOUNT", System.currentTimeMillis());
 			if(System.currentTimeMillis() >= shootTimer) {
 				Robot.flywheels.setIntakeSpeed(0);
 				Robot.flywheels.setPIDSpeed(off);
@@ -309,12 +309,12 @@ public class SwitchCase {
 			break;
 		case abortAutoAim:
 			
-			SmartDashboard.putString("Bug", "Failed to AutoAim");
+			//SmartDashboard.putString("Bug", "Failed to AutoAim");
 			state = 1;
 			break;
 		case -1:
 			Robot.drivebase.disableBrakeMode();
-			SmartDashboard.putNumber("STATE STATE STATE", -1);
+			//SmartDashboard.putNumber("STATE STATE STATE", -1);
 			Robot.flywheels.setPIDSpeed(off);
 			Robot.flywheels.setIntakeSpeed(0);
 			Robot.drivebase.autoAimController.disable();
@@ -330,7 +330,7 @@ public class SwitchCase {
 															// time of coding
 		double toSetSpeed = shootSpeed + SmarterDashboard.getNumber("OVERDRIVE", 0.0);
 		cameraVision.Update();
-		SmartDashboard.putNumber("SysTime", System.currentTimeMillis());
+		//SmartDashboard.putNumber("SysTime", System.currentTimeMillis());
 		/*
 		 * if(Vision.manVals[1] == 1) { SmarterDashboard.addDebugString(
 		 * "You're too close"); } else if(Vision.manVals[1] == 2) {
@@ -354,15 +354,15 @@ public class SwitchCase {
 
 			state = 2;
 		case 2:
-			SmartDashboard.putNumber("shootBug", System.currentTimeMillis());
-			SmartDashboard.putNumber("shootBug2", autoshootTimer);
+			//SmartDashboard.putNumber("shootBug", System.currentTimeMillis());
+			//SmartDashboard.putNumber("shootBug2", autoshootTimer);
 
 			final double[] curRPM = Robot.flywheels.getRPM();
 			final int speedsTwo = (int) cameraVision.getRPMS();
 			final int[] speedToo = {speedsTwo, speedsTwo};
 			/*
-			SmartDashboard.putString("LEFTRIGHT", String.valueOf(speedsTwo[2]) + ":" + String.valueOf(speedsTwo[3]));
-			SmartDashboard.putString("NEEDEDLEFTRIGHT",
+			//SmartDashboard.putString("LEFTRIGHT", String.valueOf(speedsTwo[2]) + ":" + String.valueOf(speedsTwo[3]));
+			//SmartDashboard.putString("NEEDEDLEFTRIGHT",
 					String.valueOf(speedsTwo[4]) + ":" + String.valueOf(speedsTwo[5]));
 			double leftPower = Robot.flywheels.getLeftPower(); // SmarterDashboard.getNumber("OVERDRIVE",
 																// 0.0);;
@@ -386,7 +386,7 @@ public class SwitchCase {
 											// 0.0) /10)};
 				Robot.flywheels.setFlywheelSpeed(newSpeed);
 				// Timer.delay(0.2);
-				// SmartDashboard.putNumber("autoAimIntakebug",
+				// //SmartDashboard.putNumber("autoAimIntakebug",
 				// System.currentTimeMillis());*/
 				Robot.flywheels.setIntakeSpeed(1);
 				Robot.flywheels.setPIDSpeed(speedToo);
@@ -399,7 +399,7 @@ public class SwitchCase {
 					Robot.flywheels.setPIDSpeed(off);
 				}
 				autoAimIntakeTimer = System.currentTimeMillis() + 1750;
-				SmartDashboard.putNumber("autoAimIntakeBug2", autoAimIntakeTimer);
+				//SmartDashboard.putNumber("autoAimIntakeBug2", autoAimIntakeTimer);
 				state = 3;
 				// }
 			} else
@@ -441,7 +441,7 @@ public class SwitchCase {
 			state = 2;
 			break;
 		case 2:
-			SmartDashboard.putNumber("autoAimManualTimer", autoAimManualTimer);
+			//SmartDashboard.putNumber("autoAimManualTimer", autoAimManualTimer);
 			if (autoAimManualTimer >= System.currentTimeMillis()) {
 				Robot.flywheels.setIntakeSpeed(0);
 				state = 3;
@@ -517,8 +517,8 @@ public class SwitchCase {
 		case 2:
 			Robot.flywheels.setPIDSpeed(shootSpeed);
 			FlyWheelTimer = System.currentTimeMillis() + 2500;
-			//SmartDashboard.putNumber("VisionManVals", Vision.manVals[0]);
-			//SmartDashboard.putString("READY READY READY", "Auto aiming");
+			////SmartDashboard.putNumber("VisionManVals", Vision.manVals[0]);
+			////SmartDashboard.putString("READY READY READY", "Auto aiming");
 			currAIM = SwitchCase.autoAim(11, 3310);
 			//FlyWheelTimer = System.currentTimeMillis() + 3000;
 			//Robot.flywheels.setFlywheelSpeed(shootSpeed);
@@ -529,18 +529,18 @@ public class SwitchCase {
 			break;
 			
 		case 3:
-			SmartDashboard.putBoolean("INQUE", true);
-			SmartDashboard.putString("CALLEDMAN", "NO");
-			//SmartDashboard.putNumber("VisionManVals", Vision.manVals[0]);
-			//SmartDashboard.putString("READY READY READY", "Auto aiming");
+			//SmartDashboard.putBoolean("INQUE", true);
+			//SmartDashboard.putString("CALLEDMAN", "NO");
+			////SmartDashboard.putNumber("VisionManVals", Vision.manVals[0]);
+			////SmartDashboard.putString("READY READY READY", "Auto aiming");
 			//Timer.delay(2);
 			if(System.currentTimeMillis() >= FlyWheelTimer) {
 				Robot.drivebase.disablePIDC();
-				SmartDashboard.putString("CALLEDMAN", "YES");
+				//SmartDashboard.putString("CALLEDMAN", "YES");
 				currAIM = SwitchCase.autoAim(currAIM, 3310);
 				if ((currAIM == 0 || currAIM == -1) && !SwitchCase.shotTheBall) {
 					currAIM = 13;
-					SmartDashboard.putString("CALLEDMAN", "RESET");
+					//SmartDashboard.putString("CALLEDMAN", "RESET");
 				}
 				
 			}
@@ -574,21 +574,21 @@ public class SwitchCase {
 		case 6://autoAim case
 			if(System.currentTimeMillis() >= FlyWheelTimer) {
 				Robot.drivebase.disablePIDC();
-				SmartDashboard.putString("CALLEDMAN", "YES");
+				//SmartDashboard.putString("CALLEDMAN", "YES");
 				currAIM = SwitchCase.autoAim(currAIM, 3310);
 				if ((currAIM == 0 || currAIM == -1) && !SwitchCase.shotTheBall) {
 					currAIM = 13;
-					SmartDashboard.putString("CALLEDMAN", "RESET");
+					//SmartDashboard.putString("CALLEDMAN", "RESET");
 				}
 			}
 			break;
 		case 7:
 			Robot.drivebase.disablePIDC();
-			SmartDashboard.putString("CALLEDMAN", "YES");
+			//SmartDashboard.putString("CALLEDMAN", "YES");
 			currAIM = SwitchCase.autoAim(currAIM, 3260);
 			if ((currAIM == 0 || currAIM == -1) && !SwitchCase.shotTheBall) {
 				currAIM = 13;
-				SmartDashboard.putString("CALLEDMAN", "RESET");
+				//SmartDashboard.putString("CALLEDMAN", "RESET");
 			}
 			break;
 		}
@@ -605,9 +605,9 @@ public class SwitchCase {
 			break;
 		case 1:
 			Robot.drivebase.resetDrive();
-			SmartDashboard.putBoolean("OnTarget", Robot.drivebase.driveController.onTarget());
-			SmartDashboard.putNumber("GetError", Robot.drivebase.driveController.getError());
-			SmartDashboard.putNumber("GetAvgError", Robot.drivebase.driveController.getAvgError());
+			//SmartDashboard.putBoolean("OnTarget", Robot.drivebase.driveController.onTarget());
+			//SmartDashboard.putNumber("GetError", Robot.drivebase.driveController.getError());
+			//SmartDashboard.putNumber("GetAvgError", Robot.drivebase.driveController.getAvgError());
 			Robot.drivebase.enablePIDCDrive(-0.68, 0.1);
 			state = -1;
 			break;
@@ -624,25 +624,25 @@ public class SwitchCase {
 				else
 					state = 3;
 			}
-			SmartDashboard.putBoolean("INQUE", false);
+			//SmartDashboard.putBoolean("INQUE", false);
 			break;
 		case -2:
 			//Start autoAim. Nothing else.
 			currAIM = SwitchCase.autoAim(11, 3310);
 			state = 2;
 		case 2:
-			SmartDashboard.putBoolean("INQUE", true);
-			SmartDashboard.putString("CALLEDMAN", "NO");
-			//SmartDashboard.putNumber("VisionManVals", Vision.manVals[0]);
-			//SmartDashboard.putString("READY READY READY", "Auto aiming");
+			//SmartDashboard.putBoolean("INQUE", true);
+			//SmartDashboard.putString("CALLEDMAN", "NO");
+			////SmartDashboard.putNumber("VisionManVals", Vision.manVals[0]);
+			////SmartDashboard.putString("READY READY READY", "Auto aiming");
 			//Timer.delay(2);
 			if(System.currentTimeMillis() >= FlyWheelTimer) {
 				Robot.drivebase.disablePIDC();
-				SmartDashboard.putString("CALLEDMAN", "YES");
+				//SmartDashboard.putString("CALLEDMAN", "YES");
 				currAIM = SwitchCase.autoAim(currAIM, 3310);
 				if ((currAIM == 0 || currAIM == -1) && !SwitchCase.shotTheBall) {
 					currAIM = 13;
-					SmartDashboard.putString("CALLEDMAN", "RESET");
+					//SmartDashboard.putString("CALLEDMAN", "RESET");
 				}
 				
 			}
@@ -671,11 +671,11 @@ public class SwitchCase {
 			} 
 			break;
 		case 5://Dead state
-			SmartDashboard.putBoolean("isMoving", Robot.drivebase.ahrs.isMoving());
-			SmartDashboard.putBoolean("isRotating", Robot.drivebase.ahrs.isRotating());
-			SmartDashboard.putBoolean("OnTarget", Robot.drivebase.driveController.onTarget());
-			SmartDashboard.putNumber("GetError", Robot.drivebase.driveController.getError());
-			SmartDashboard.putNumber("GetAvgError", Robot.drivebase.driveController.getAvgError());
+			//SmartDashboard.putBoolean("isMoving", Robot.drivebase.ahrs.isMoving());
+			//SmartDashboard.putBoolean("isRotating", Robot.drivebase.ahrs.isRotating());
+			//SmartDashboard.putBoolean("OnTarget", Robot.drivebase.driveController.onTarget());
+			//SmartDashboard.putNumber("GetError", Robot.drivebase.driveController.getError());
+			//SmartDashboard.putNumber("GetAvgError", Robot.drivebase.driveController.getAvgError());
 			driveBase.drive(0.0, 0.0);
 			break;
 		}
@@ -701,9 +701,9 @@ public class SwitchCase {
 			break;
 		case -17:
 			Robot.drivebase.resetDrive();
-			SmartDashboard.putBoolean("OnTarget", Robot.drivebase.driveController.onTarget());
-			SmartDashboard.putNumber("GetError", Robot.drivebase.driveController.getError());
-			SmartDashboard.putNumber("GetAvgError", Robot.drivebase.driveController.getAvgError());
+			//SmartDashboard.putBoolean("OnTarget", Robot.drivebase.driveController.onTarget());
+			//SmartDashboard.putNumber("GetError", Robot.drivebase.driveController.getError());
+			//SmartDashboard.putNumber("GetAvgError", Robot.drivebase.driveController.getAvgError());
 			Robot.drivebase.enablePIDCDrive(-0.68, 0.1);
 			state = -1;
 			break;
@@ -720,25 +720,25 @@ public class SwitchCase {
 				else
 					state = 3;
 			}
-			SmartDashboard.putBoolean("INQUE", false);
+			//SmartDashboard.putBoolean("INQUE", false);
 			break;
 		case -2:
 			//Start autoAim. Nothing else.
 			currAIM = SwitchCase.autoAim(11, 3310);
 			state = 2;
 		case 2:
-			SmartDashboard.putBoolean("INQUE", true);
-			SmartDashboard.putString("CALLEDMAN", "NO");
-			//SmartDashboard.putNumber("VisionManVals", Vision.manVals[0]);
-			//SmartDashboard.putString("READY READY READY", "Auto aiming");
+			//SmartDashboard.putBoolean("INQUE", true);
+			//SmartDashboard.putString("CALLEDMAN", "NO");
+			////SmartDashboard.putNumber("VisionManVals", Vision.manVals[0]);
+			////SmartDashboard.putString("READY READY READY", "Auto aiming");
 			//Timer.delay(2);
 			if(System.currentTimeMillis() >= FlyWheelTimer) {
 				Robot.drivebase.disablePIDC();
-				SmartDashboard.putString("CALLEDMAN", "YES");
+				//SmartDashboard.putString("CALLEDMAN", "YES");
 				currAIM = SwitchCase.autoAim(currAIM, 3310);
 				if ((currAIM == 0 || currAIM == -1) && !SwitchCase.shotTheBall) {
 					currAIM = 13;
-					SmartDashboard.putString("CALLEDMAN", "RESET");
+					//SmartDashboard.putString("CALLEDMAN", "RESET");
 				}
 				
 			}
@@ -767,11 +767,11 @@ public class SwitchCase {
 			} 
 			break;
 		case 5://Dead state
-			SmartDashboard.putBoolean("isMoving", Robot.drivebase.ahrs.isMoving());
-			SmartDashboard.putBoolean("isRotating", Robot.drivebase.ahrs.isRotating());
-			SmartDashboard.putBoolean("OnTarget", Robot.drivebase.driveController.onTarget());
-			SmartDashboard.putNumber("GetError", Robot.drivebase.driveController.getError());
-			SmartDashboard.putNumber("GetAvgError", Robot.drivebase.driveController.getAvgError());
+			//SmartDashboard.putBoolean("isMoving", Robot.drivebase.ahrs.isMoving());
+			//SmartDashboard.putBoolean("isRotating", Robot.drivebase.ahrs.isRotating());
+			//SmartDashboard.putBoolean("OnTarget", Robot.drivebase.driveController.onTarget());
+			//SmartDashboard.putNumber("GetError", Robot.drivebase.driveController.getError());
+			//SmartDashboard.putNumber("GetAvgError", Robot.drivebase.driveController.getAvgError());
 			driveBase.drive(0.0, 0.0);
 			break;
 		}
@@ -800,10 +800,10 @@ public class SwitchCase {
 				changePitchMax = changePitch;
 			if(changeRollMax > changeRollMax)
 				changeRollMax = changeRoll;
-			SmartDashboard.putNumber("changePitch", changePitch);
-			SmartDashboard.putNumber("changeRoll", changeRoll);
-			SmartDashboard.putNumber("changePitchMax", changePitchMax);
-			SmartDashboard.putNumber("changeRollMax", changeRollMax);
+			//SmartDashboard.putNumber("changePitch", changePitch);
+			//SmartDashboard.putNumber("changeRoll", changeRoll);
+			//SmartDashboard.putNumber("changePitchMax", changePitchMax);
+			//SmartDashboard.putNumber("changeRollMax", changeRollMax);
 			if(Math.abs(changePitchMax) > .6 || Math.abs(changeRollMax) > .6){
 				Robot.drivebase.driveController.disable();
 				Robot.drivebase.drive(0.0, 0.0);
@@ -821,9 +821,9 @@ public class SwitchCase {
 			break;
 		case -17:
 			Robot.drivebase.resetDrive();
-			SmartDashboard.putBoolean("OnTarget", Robot.drivebase.driveController.onTarget());
-			SmartDashboard.putNumber("GetError", Robot.drivebase.driveController.getError());
-			SmartDashboard.putNumber("GetAvgError", Robot.drivebase.driveController.getAvgError());
+			//SmartDashboard.putBoolean("OnTarget", Robot.drivebase.driveController.onTarget());
+			//SmartDashboard.putNumber("GetError", Robot.drivebase.driveController.getError());
+			//SmartDashboard.putNumber("GetAvgError", Robot.drivebase.driveController.getAvgError());
 			Robot.drivebase.enablePIDCDrive(-0.7, 0.1);
 			state = -1;
 			break;
@@ -840,25 +840,25 @@ public class SwitchCase {
 				else
 					state = 3;
 			}
-			SmartDashboard.putBoolean("INQUE", false);
+			//SmartDashboard.putBoolean("INQUE", false);
 			break;
 		case -2:
 			//Start autoAim. Nothing else.
 			currAIM = SwitchCase.autoAim(11, 3310);
 			state = 2;
 		case 2:
-			SmartDashboard.putBoolean("INQUE", true);
-			SmartDashboard.putString("CALLEDMAN", "NO");
-			//SmartDashboard.putNumber("VisionManVals", Vision.manVals[0]);
-			//SmartDashboard.putString("READY READY READY", "Auto aiming");
+			//SmartDashboard.putBoolean("INQUE", true);
+			//SmartDashboard.putString("CALLEDMAN", "NO");
+			////SmartDashboard.putNumber("VisionManVals", Vision.manVals[0]);
+			////SmartDashboard.putString("READY READY READY", "Auto aiming");
 			//Timer.delay(2);
 			if(System.currentTimeMillis() >= FlyWheelTimer) {
 				Robot.drivebase.disablePIDC();
-				SmartDashboard.putString("CALLEDMAN", "YES");
+				//SmartDashboard.putString("CALLEDMAN", "YES");
 				currAIM = SwitchCase.autoAim(currAIM, 3310);
 				if ((currAIM == 0 || currAIM == -1) && !SwitchCase.shotTheBall) {
 					currAIM = 13;
-					SmartDashboard.putString("CALLEDMAN", "RESET");
+					//SmartDashboard.putString("CALLEDMAN", "RESET");
 				}
 				
 			}
@@ -887,97 +887,14 @@ public class SwitchCase {
 			} 
 			break;
 		case 5://Dead state
-			SmartDashboard.putBoolean("isMoving", Robot.drivebase.ahrs.isMoving());
-			SmartDashboard.putBoolean("isRotating", Robot.drivebase.ahrs.isRotating());
-			SmartDashboard.putBoolean("OnTarget", Robot.drivebase.driveController.onTarget());
-			SmartDashboard.putNumber("GetError", Robot.drivebase.driveController.getError());
-			SmartDashboard.putNumber("GetAvgError", Robot.drivebase.driveController.getAvgError());
+			//SmartDashboard.putBoolean("isMoving", Robot.drivebase.ahrs.isMoving());
+			//SmartDashboard.putBoolean("isRotating", Robot.drivebase.ahrs.isRotating());
+			//SmartDashboard.putBoolean("OnTarget", Robot.drivebase.driveController.onTarget());
+			//SmartDashboard.putNumber("GetError", Robot.drivebase.driveController.getError());
+			//SmartDashboard.putNumber("GetAvgError", Robot.drivebase.driveController.getAvgError());
 			driveBase.drive(0.0, 0.0);
 			break;
 		}
 		return state;
 	}
 }
-
-	/*
-	public static int climb(int state) {
-		switch (state) {
-		default:
-			break;
-		case 0:
-			break;
-		case 1:
-			Robot.pneumatics.extendClimber.set(DoubleSolenoid.Value.kForward);
-			extendClimberTimer = System.currentTimeMillis() + 2000;
-			state = 2;
-			break;
-		case 2:
-			if (System.currentTimeMillis() >= extendClimberTimer) {
-				state = 3;
-			}
-			break;
-		case 3:
-			raiseClimberTimer = System.currentTimeMillis() + 2000;
-			Robot.pneumatics.raiseClimber.set(DoubleSolenoid.Value.kForward);
-			state = 4;
-			break;
-		case 4:
-			if (System.currentTimeMillis() >= raiseClimberTimer) {
-				state = 5;
-			}
-			break;
-		case 5:
-			Robot.pneumatics.extendClimber.set(DoubleSolenoid.Value.kReverse);
-			extendClimberTimer = System.currentTimeMillis() + 500;
-			state = 6;
-			break;
-		case 6:
-			if (System.currentTimeMillis() >= extendClimberTimer) {
-				state = 7;
-			}
-			break;
-		case 7: // Done, do winch now.
-			state = 0;
-			break;
-		// For reverse-climbing. Make sure to update the delays for BOTH
-		// climbing/letting go
-		case 8:
-			Robot.pneumatics.extendClimber.set(DoubleSolenoid.Value.kForward);
-			extendClimberTimer = System.currentTimeMillis() + 500;
-			state = 9;
-			break;
-		case 9:
-			if (System.currentTimeMillis() >= extendClimberTimer) {
-				state = 10;
-			}
-			break;
-		case 10:
-			Robot.pneumatics.raiseClimber.set(DoubleSolenoid.Value.kReverse);
-			raiseClimberTimer = System.currentTimeMillis() + 2000;
-			state = 11;
-			break;
-		case 11:
-			if (System.currentTimeMillis() >= raiseClimberTimer) {
-				state = 12;
-			}
-			break;
-		case 12:
-			Robot.pneumatics.extendClimber.set(DoubleSolenoid.Value.kReverse);
-			extendClimberTimer = System.currentTimeMillis() + 2000;
-			state = 13;
-			break;
-		case 13:
-			Robot.pneumatics.extendClimber.set(DoubleSolenoid.Value.kReverse);
-			Robot.pneumatics.raiseClimber.set(DoubleSolenoid.Value.kReverse);
-			state = 14;
-			break;
-		case 14:
-			state = 0;
-			break;
-		case -1:
-			state = 13;
-			break;
-		}
-		return state;
-	}
-}*/
