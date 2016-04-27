@@ -42,8 +42,10 @@ public class Shooter {
 		rightFW.enableBrakeMode(false);
 		leftFW.changeControlMode(TalonControlMode.Speed);
 		rightFW.changeControlMode(TalonControlMode.Speed);
-		leftFW.setPID(0.2, 0.00021, 0, 0, 0, 12, 0);
-		rightFW.setPID(0.2, 0.00021, 0, 0, 0, 12, 0);
+		//leftFW.setPID(0.2, 0.00021, 0, 0, 0, 12, 0);
+		//rightFW.setPID(0.2, 0.00021, 0, 0, 0, 12, 0);
+		leftFW.setPID(0.4, 0.00021, 0.01, 0, 0, 12, 0);
+		rightFW.setPID(0.4, 0.00021, 0.01, 0, 0, 12, 0);
 		rightFW.setFeedbackDevice(FeedbackDevice.EncRising);
 		leftFW.setFeedbackDevice(FeedbackDevice.EncRising);
 		leftFW.configEncoderCodesPerRev(1024);
